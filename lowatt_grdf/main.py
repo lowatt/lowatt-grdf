@@ -58,7 +58,7 @@ def options_from_model(
     model: Type[pydantic.BaseModel],
 ) -> Callable[[Callback], Callback]:
     def decorator(func: Callback) -> Callback:
-        for field in reversed(model.__fields__.values()):
+        for field in reversed(list(model.__fields__.values())):
             opt = field.alias.replace("_", "-")
             opt = f"--{opt}"
             kwargs = {
