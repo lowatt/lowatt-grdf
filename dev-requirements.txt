@@ -1,0 +1,14 @@
+flake8
+flake8-bugbear
+flake8-builtins
+flake8-comprehensions
+flake8-debugger
+flake8-logging-format
+flake8-rst-docstrings
+flake8-pep3101
+flake8-print
+flake8-string-format
+check-manifest
+isort
+black
+
