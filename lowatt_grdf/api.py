@@ -21,7 +21,7 @@
 import abc
 import functools
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import ndjson
 import requests
@@ -99,11 +99,13 @@ class BaseAPI(metaclass=abc.ABCMeta):
         assert isinstance(token, str)
         return token
 
-    def droits_acces(self) -> Any:
-        return self.get(f"{self.api}/droits_acces")
+    def droits_acces(self, pce: Optional[List[str]] = None) -> Any:
+        if not pce:
+            return self.get(f"{self.api}/droits_acces")
+        return self.post(f"{self.api}/droits_acces", json={"id_pce": pce})
 
-    def check_consent_validation(self) -> None:
-        resp = self.droits_acces()
+    def check_consent_validation(self, pce: Optional[List[str]] = None) -> None:
+        resp = self.droits_acces(pce)
         # XXX: this looks like a bug, "liste_acces" should be part of the response
         if resp and "liste_acces" in resp[0]:
             droits = resp[0]["liste_acces"]

@@ -22,7 +22,7 @@ import json
 import logging
 import os
 import sys
-from typing import Any, Callable, Type
+from typing import Any, Callable, Tuple, Type
 
 import click
 import pydantic
@@ -81,6 +81,7 @@ def main() -> None:
 
 
 @main.command()
+@click.argument("pce", nargs=-1)
 @click.option(
     "--check",
     default=False,
@@ -88,12 +89,14 @@ def main() -> None:
     help="Check droits-access and exit with error in case of consent validation error",
 )
 @api_options
-def droits_acces(client_id: str, client_secret: str, bas: bool, check: bool) -> None:
+def droits_acces(
+    client_id: str, client_secret: str, bas: bool, pce: Tuple[str], check: bool
+) -> None:
     grdf = {True: api.StagingAPI, False: api.API}[bas](client_id, client_secret)
     if check:
-        grdf.check_consent_validation()
+        grdf.check_consent_validation(list(pce))
     else:
-        json.dump(grdf.droits_acces(), sys.stdout)
+        json.dump(grdf.droits_acces(list(pce)), sys.stdout)
 
 
 @main.command()
