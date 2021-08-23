@@ -22,8 +22,7 @@ import ndjson
 import pytest
 import responses
 
-from lowatt_grdf import api
-from lowatt_grdf import models
+from lowatt_grdf import api, models
 
 
 @pytest.fixture
