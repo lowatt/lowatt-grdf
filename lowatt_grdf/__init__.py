@@ -20,4 +20,4 @@
 
 import logging
 
-LOGGER = logging.getLogger("lowatt_grdf")
+LOGGER = logging.getLogger("lowatt.grdf")

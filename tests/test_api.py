@@ -151,7 +151,7 @@ def test_check_constent_validation_ok(grdf, caplog):
         headers={"Content-Type": "application/nd-json"},
         body=ndjson.dumps(payload),
     )
-    with caplog.at_level("INFO", logger="lowatt_grdf"):
+    with caplog.at_level("INFO", logger="lowatt.grdf"):
         grdf.check_consent_validation()
     assert [r.message for r in caplog.records] == [
         "Access to <PCE GI000000 from John Doe Inc. (jdoe@example.com)> OK",
@@ -175,7 +175,7 @@ def test_check_constent_validation_inactive(grdf, caplog):
         headers={"Content-Type": "application/nd-json"},
         body=ndjson.dumps(payload),
     )
-    with caplog.at_level("INFO", logger="lowatt_grdf"):
+    with caplog.at_level("INFO", logger="lowatt.grdf"):
         grdf.check_consent_validation()
     assert [r.message for r in caplog.records] == [
         "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: status is 'À valider'",
@@ -199,7 +199,7 @@ def test_check_constent_validation_preuve(grdf, caplog):
         headers={"Content-Type": "application/nd-json"},
         body=ndjson.dumps(payload),
     )
-    with caplog.at_level("INFO", logger="lowatt_grdf"), pytest.raises(
+    with caplog.at_level("INFO", logger="lowatt.grdf"), pytest.raises(
         RuntimeError, match="Theses consents have validation issues"
     ):
         grdf.check_consent_validation()
@@ -353,7 +353,7 @@ def test_declare_acces(grdf, caplog):
     )
     # XXX: use a real life response
     responses.add(responses.PUT, f"{grdf.api}/pce/23000000000000/droit_acces", json={})
-    with caplog.at_level("INFO", logger="lowatt_grdf"):
+    with caplog.at_level("INFO", logger="lowatt.grdf"):
         grdf.declare_acces(access)
     assert [r.message for r in caplog.records] == [
         "Successfully declared access to 23000000000000",
