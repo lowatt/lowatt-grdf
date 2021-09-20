@@ -27,8 +27,9 @@ from typing import Any, Callable, Tuple, Type
 
 import click
 import pydantic
+import requests
 
-from . import api, models
+from . import LOGGER, api, models
 
 Callback = Callable[..., None]
 
@@ -98,12 +99,28 @@ def _validate_date_as_datetime(ctx, param, value):
     return value + " 00:00:00"
 
 
+def main():
+    try:
+        _main()
+    except requests.HTTPError as exc:
+        LOGGER.error(exc)
+        if exc.response is not None:
+            try:
+                data = exc.response.json()
+            except Exception:
+                pass
+            else:
+                LOGGER.error(
+                    "%(code_statut_traitement)s: %(message_retour_traitement)s", data
+                )
+        sys.exit(1)
+
+
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
-def main() -> None:
+def _main() -> None:
     logging.basicConfig(level="INFO", format="%(levelname)s %(message)s")
 
-
-@main.command()
+@_main.command()
 @click.argument("pce", nargs=-1)
 @click.option(
     "--check",
@@ -122,7 +139,7 @@ def droits_acces(
         json.dump(grdf.droits_acces(list(pce)), sys.stdout)
 
 
-@main.command()
+@_main.command()
 @click.argument("pce")
 @click.option("--from-date", required=True)
 @click.option("--to-date", required=True)
@@ -139,7 +156,7 @@ def donnees_consos_publiees(
     json.dump(grdf.donnees_consos_publiees(pce, from_date, to_date), sys.stdout)
 
 
-@main.command()
+@_main.command()
 @click.argument("pce")
 @click.option("--from-date", required=True)
 @click.option("--to-date", required=True)
@@ -156,7 +173,7 @@ def donnees_consos_informatives(
     json.dump(grdf.donnees_consos_informatives(pce, from_date, to_date), sys.stdout)
 
 
-@main.command()
+@_main.command()
 @click.argument("pce")
 @api_options
 def donnees_contractuelles(
@@ -169,7 +186,7 @@ def donnees_contractuelles(
     json.dump(grdf.donnees_contractuelles(pce), sys.stdout)
 
 
-@main.command()
+@_main.command()
 @click.argument("pce")
 @api_options
 def donnees_techniques(
@@ -182,7 +199,7 @@ def donnees_techniques(
     json.dump(grdf.donnees_techniques(pce), sys.stdout)
 
 
-@main.command()
+@_main.command()
 @api_options
 @options_from_model(models.DeclareAccess)
 def declare_acces(
