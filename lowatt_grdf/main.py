@@ -22,6 +22,7 @@ import json
 import logging
 import os
 import sys
+import time
 from typing import Any, Callable, Tuple, Type
 
 import click
@@ -69,10 +70,32 @@ def options_from_model(
                 kwargs["help"] = field.field_info.description
             if field.type_ == bool:
                 kwargs["is_flag"] = True
+            if field.alias.startswith("date_"):
+                if field.alias == "date_fin_autorisation_demandee":
+                    # Expect a datetime while it seems more consistent to use a
+                    # simple date.
+                    kwargs["callback"] = _validate_date_as_datetime
+                else:
+                    kwargs["callback"] = _validate_date
+                kwargs["metavar"] = "YYYY-MM-DD"
             click.option(opt, **kwargs)(func)
         return func
 
     return decorator
+
+
+def _validate_date(ctx, param, value):
+    assert isinstance(value, str), type(value)
+    try:
+        time.strptime(value, "%Y-%m-%d")
+        return value
+    except ValueError:
+        raise click.BadParameter("format must be 'YYYY-MM-DD'")
+
+
+def _validate_date_as_datetime(ctx, param, value):
+    _validate_date(ctx, param, value)
+    return value + " 00:00:00"
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})

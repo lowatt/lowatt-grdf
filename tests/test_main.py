@@ -65,9 +65,9 @@ Options:
   --nom-titulaire TEXT
   --code-postal TEXT              [required]
   --courriel-titulaire TEXT       [required]
-  --date-consentement-declaree TEXT
+  --date-consentement-declaree YYYY-MM-DD
                                   [required]
-  --date-fin-autorisation-demandee TEXT
+  --date-fin-autorisation-demandee YYYY-MM-DD
                                   [required]
   --perim-donnees-techniques-et-contractuelles
   --perim-historique-de-donnees
