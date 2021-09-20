@@ -85,21 +85,21 @@ def options_from_model(
     return decorator
 
 
-def _validate_date(ctx, param, value):
+def _validate_date(ctx: Any, param: str, value: str) -> str:
     assert isinstance(value, str), type(value)
     try:
         time.strptime(value, "%Y-%m-%d")
         return value
-    except ValueError:
-        raise click.BadParameter("format must be 'YYYY-MM-DD'")
+    except ValueError as exc:
+        raise click.BadParameter("format must be 'YYYY-MM-DD'") from exc
 
 
-def _validate_date_as_datetime(ctx, param, value):
+def _validate_date_as_datetime(ctx: Any, param: str, value: str) -> str:
     _validate_date(ctx, param, value)
     return value + " 00:00:00"
 
 
-def main():
+def main() -> None:
     try:
         _main()
     except requests.HTTPError as exc:
@@ -119,6 +119,7 @@ def main():
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
 def _main() -> None:
     logging.basicConfig(level="INFO", format="%(levelname)s %(message)s")
+
 
 @_main.command()
 @click.argument("pce", nargs=-1)
