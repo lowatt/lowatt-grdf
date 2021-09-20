@@ -34,7 +34,7 @@ def test_cli_base() -> None:
         == """Usage: main [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  --help  Show this message and exit.
+  -h, --help  Show this message and exit.
 
 Commands:
   declare-acces
@@ -57,7 +57,7 @@ def test_cli_declare_acces() -> None:
 
 Options:
   --bas                           Use staging (bac à sable) environment
-  --client-secret TEXT            openid client id  [required]
+  --client-secret TEXT            openid client secret  [required]
   --client-id TEXT                openid client id  [required]
   --pce TEXT                      [required]
   --role-tiers TEXT
@@ -74,6 +74,6 @@ Options:
   --perim-flux-de-donnees
   --perim-donnees-informatives
   --perim-donnees-publiees
-  --help                          Show this message and exit.
+  -h, --help                      Show this message and exit.
 """
     )

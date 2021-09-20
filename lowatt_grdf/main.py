@@ -43,7 +43,7 @@ def api_options(func: Callback) -> Callback:
         "--client-secret",
         required="CLIENT_SECRET" not in os.environ,
         default=os.environ.get("CLIENT_SECRET"),
-        help="openid client id",
+        help="openid client secret",
     )(func)
     click.option(
         "--bas",
@@ -75,7 +75,7 @@ def options_from_model(
     return decorator
 
 
-@click.group()
+@click.group(context_settings={"help_option_names": ["-h", "--help"]})
 def main() -> None:
     logging.basicConfig(level="INFO", format="%(levelname)s %(message)s")
 
