@@ -85,7 +85,7 @@ def options_from_model(
     return decorator
 
 
-def _validate_date(ctx: Any, param: str, value: str) -> str:
+def _validate_date(ctx: Any, param: Any, value: str) -> str:
     assert isinstance(value, str), type(value)
     try:
         time.strptime(value, "%Y-%m-%d")
@@ -94,7 +94,7 @@ def _validate_date(ctx: Any, param: str, value: str) -> str:
         raise click.BadParameter("format must be 'YYYY-MM-DD'") from exc
 
 
-def _validate_date_as_datetime(ctx: Any, param: str, value: str) -> str:
+def _validate_date_as_datetime(ctx: Any, param: Any, value: str) -> str:
     _validate_date(ctx, param, value)
     return value + " 00:00:00"
 
