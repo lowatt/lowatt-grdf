@@ -22,7 +22,6 @@ import json
 import logging
 import os
 import sys
-import time
 from typing import Any, Callable, Tuple, Type
 
 import click
@@ -72,31 +71,11 @@ def options_from_model(
             if field.type_ == bool:
                 kwargs["is_flag"] = True
             if field.alias.startswith("date_"):
-                if field.alias == "date_consentement_declaree":
-                    # Expect a datetime while it seems more consistent to use a
-                    # simple date.
-                    kwargs["callback"] = _validate_date_as_datetime
-                else:
-                    kwargs["callback"] = _validate_date
                 kwargs["metavar"] = "YYYY-MM-DD"
             click.option(opt, **kwargs)(func)
         return func
 
     return decorator
-
-
-def _validate_date(ctx: Any, param: Any, value: str) -> str:
-    assert isinstance(value, str), type(value)
-    try:
-        time.strptime(value, "%Y-%m-%d")
-        return value
-    except ValueError as exc:
-        raise click.BadParameter("format must be 'YYYY-MM-DD'") from exc
-
-
-def _validate_date_as_datetime(ctx: Any, param: Any, value: str) -> str:
-    _validate_date(ctx, param, value)
-    return value + " 00:00:00"
 
 
 def main() -> None:

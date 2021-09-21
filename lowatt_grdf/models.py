@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 import json
+import time
 from typing import Any, Dict, Optional
 
 import pydantic
@@ -62,6 +63,27 @@ class DeclareAccess(pydantic.BaseModel):
                 "One of raison-sociale or nom-titulaire should be specified"
             )
         return values
+
+    @pydantic.root_validator()
+    def check_date_format(
+        cls,  # noqa: B902 (Invalid first argument 'cls' used for instance method.)
+        values: Dict[str, str],
+    ) -> Dict[str, str]:
+        for param in "date_consentement_declaree", "date_fin_autorisation_demandee":
+            _validate_date_format(param, values[param])
+        # Expect a datetime while it seems more consistent to use a simple date.
+        values["date_consentement_declaree"] += " 00:00:00"
+        return values
+
+
+def _validate_date_format(param: str, value: str) -> None:
+    assert isinstance(value, str), type(value)
+    try:
+        time.strptime(value, "%Y-%m-%d")
+    except ValueError as exc:
+        raise ValueError(
+            f"format of {param} must be 'YYYY-MM-DD', got {value}"
+        ) from exc
 
 
 class Access(pydantic.BaseModel):
