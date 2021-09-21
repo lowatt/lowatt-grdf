@@ -108,11 +108,17 @@ def main() -> None:
             try:
                 data = exc.response.json()
             except Exception:
-                pass
+                LOGGER.debug("No error details, response isn't JSON")
             else:
-                LOGGER.error(
-                    "%(code_statut_traitement)s: %(message_retour_traitement)s", data
-                )
+                try:
+                    LOGGER.error(
+                        "%(code_statut_traitement)s: %(message_retour_traitement)s",
+                        data,
+                    )
+                except KeyError:
+                    LOGGER.debug(
+                        "No error details, available keys in JSON are %s", list(data)
+                    )
         sys.exit(1)
 
 
