@@ -72,7 +72,7 @@ def options_from_model(
             if field.type_ == bool:
                 kwargs["is_flag"] = True
             if field.alias.startswith("date_"):
-                if field.alias == "date_fin_autorisation_demandee":
+                if field.alias == "date_consentement_declaree":
                     # Expect a datetime while it seems more consistent to use a
                     # simple date.
                     kwargs["callback"] = _validate_date_as_datetime
