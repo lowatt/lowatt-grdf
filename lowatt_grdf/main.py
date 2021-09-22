@@ -26,8 +26,9 @@ from typing import Any, Callable, Tuple, Type
 
 import click
 import pydantic
+import requests
 
-from . import api, models
+from . import LOGGER, api, models
 
 Callback = Callable[..., None]
 
@@ -43,7 +44,7 @@ def api_options(func: Callback) -> Callback:
         "--client-secret",
         required="CLIENT_SECRET" not in os.environ,
         default=os.environ.get("CLIENT_SECRET"),
-        help="openid client id",
+        help="openid client secret",
     )(func)
     click.option(
         "--bas",
@@ -69,13 +70,26 @@ def options_from_model(
                 kwargs["help"] = field.field_info.description
             if field.type_ == bool:
                 kwargs["is_flag"] = True
+            if field.alias.startswith("date_"):
+                kwargs["metavar"] = "YYYY-MM-DD"
             click.option(opt, **kwargs)(func)
         return func
 
     return decorator
 
 
-@click.group()
+class ExceptionHandler(click.Group):
+    def __call__(self, *args: Any, **kwargs: Any) -> None:
+        try:
+            self.main(*args, **kwargs)
+        except requests.HTTPError as exc:
+            LOGGER.error(exc)
+            sys.exit(1)
+
+
+@click.group(
+    cls=ExceptionHandler, context_settings={"help_option_names": ["-h", "--help"]}
+)
 def main() -> None:
     logging.basicConfig(level="INFO", format="%(levelname)s %(message)s")
 

@@ -68,7 +68,16 @@ class BaseAPI(metaclass=abc.ABCMeta):
             time.sleep(min(max(time.time() - self._last_request, 1), 1))
         resp = requests.request(verb, *args, **kwargs)
         self._last_request = time.time()
-        resp.raise_for_status()
+        try:
+            resp.raise_for_status()
+        except requests.HTTPError:
+            try:
+                data = resp.json()
+            except Exception:
+                LOGGER.debug("No error details, response isn't JSON")
+            else:
+                LOGGER.error(data)
+            raise
         # XXX: duno why but without strip it doesn't work.
         # Either an implementation error of ndjson module
         # or bad response from GrDF API (at least on staging environment)
