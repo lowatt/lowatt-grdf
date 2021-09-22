@@ -78,20 +78,23 @@ def options_from_model(
     return decorator
 
 
+class ExceptionHandler(click.Group):
+    def __call__(self, *args: Any, **kwargs: Any) -> None:
+        try:
+            self.main(*args, **kwargs)
+        except requests.HTTPError as exc:
+            LOGGER.error(exc)
+            sys.exit(1)
+
+
+@click.group(
+    cls=ExceptionHandler, context_settings={"help_option_names": ["-h", "--help"]}
+)
 def main() -> None:
-    try:
-        _main()
-    except requests.HTTPError as exc:
-        LOGGER.error(exc)
-        sys.exit(1)
-
-
-@click.group(context_settings={"help_option_names": ["-h", "--help"]})
-def _main() -> None:
     logging.basicConfig(level="INFO", format="%(levelname)s %(message)s")
 
 
-@_main.command()
+@main.command()
 @click.argument("pce", nargs=-1)
 @click.option(
     "--check",
@@ -110,7 +113,7 @@ def droits_acces(
         json.dump(grdf.droits_acces(list(pce)), sys.stdout)
 
 
-@_main.command()
+@main.command()
 @click.argument("pce")
 @click.option("--from-date", required=True)
 @click.option("--to-date", required=True)
@@ -127,7 +130,7 @@ def donnees_consos_publiees(
     json.dump(grdf.donnees_consos_publiees(pce, from_date, to_date), sys.stdout)
 
 
-@_main.command()
+@main.command()
 @click.argument("pce")
 @click.option("--from-date", required=True)
 @click.option("--to-date", required=True)
@@ -144,7 +147,7 @@ def donnees_consos_informatives(
     json.dump(grdf.donnees_consos_informatives(pce, from_date, to_date), sys.stdout)
 
 
-@_main.command()
+@main.command()
 @click.argument("pce")
 @api_options
 def donnees_contractuelles(
@@ -157,7 +160,7 @@ def donnees_contractuelles(
     json.dump(grdf.donnees_contractuelles(pce), sys.stdout)
 
 
-@_main.command()
+@main.command()
 @click.argument("pce")
 @api_options
 def donnees_techniques(
@@ -170,7 +173,7 @@ def donnees_techniques(
     json.dump(grdf.donnees_techniques(pce), sys.stdout)
 
 
-@_main.command()
+@main.command()
 @api_options
 @options_from_model(models.DeclareAccess)
 def declare_acces(

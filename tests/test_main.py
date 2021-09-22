@@ -27,11 +27,11 @@ from lowatt_grdf import main
 
 def test_cli_base() -> None:
     runner = CliRunner()
-    result = runner.invoke(main._main)
+    result = runner.invoke(main.main)
     assert result.exit_code == 0
     assert (
         result.stdout
-        == """Usage: -main [OPTIONS] COMMAND [ARGS]...
+        == """Usage: main [OPTIONS] COMMAND [ARGS]...
 
 Options:
   -h, --help  Show this message and exit.
@@ -49,11 +49,11 @@ Commands:
 
 def test_cli_declare_acces() -> None:
     runner = CliRunner()
-    result = runner.invoke(main._main, ["declare-acces", "--help"])
+    result = runner.invoke(main.main, ["declare-acces", "--help"])
     assert result.exit_code == 0
     assert (
         result.stdout
-        == """Usage: -main declare-acces [OPTIONS]
+        == """Usage: main declare-acces [OPTIONS]
 
 Options:
   --bas                           Use staging (bac à sable) environment
