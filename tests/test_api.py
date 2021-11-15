@@ -183,6 +183,60 @@ def test_check_constent_validation_inactive(grdf, caplog):
 
 
 @responses.activate
+def test_check_constent_multiple_ok(grdf, caplog):
+    access = dict(ACCESS_PAYLOAD)
+    access["etat_droit_acces"] = "À valider"
+    payload = [
+        ACCESS_PAYLOAD,
+        access,
+        {
+            "code_statut_traitement": "0000000000",
+            "message_retour_traitement": "L'opération s'est déroulée avec succès.",
+        },
+    ]
+    responses.add(
+        responses.GET,
+        f"{grdf.api}/droits_acces",
+        headers={"Content-Type": "application/nd-json"},
+        body=ndjson.dumps(payload),
+    )
+    with caplog.at_level("INFO", logger="lowatt.grdf"):
+        grdf.check_consent_validation()
+    assert [r.message for r in caplog.records] == [
+        "Access to <PCE GI000000 from John Doe Inc. (jdoe@example.com)> OK",
+    ]
+
+
+@responses.activate
+def test_check_constent_multiple_ko(grdf, caplog):
+    access1 = dict(ACCESS_PAYLOAD)
+    access1["etat_droit_acces"] = "À valider"
+    access2 = dict(ACCESS_PAYLOAD)
+    access2["perim_donnees_publiees"] = "Faux"
+    access2["perim_donnees_informatives"] = "Faux"
+    payload = [
+        access1,
+        access2,
+        {
+            "code_statut_traitement": "0000000000",
+            "message_retour_traitement": "L'opération s'est déroulée avec succès.",
+        },
+    ]
+    responses.add(
+        responses.GET,
+        f"{grdf.api}/droits_acces",
+        headers={"Content-Type": "application/nd-json"},
+        body=ndjson.dumps(payload),
+    )
+    with caplog.at_level("INFO", logger="lowatt.grdf"):
+        grdf.check_consent_validation()
+    assert [r.message for r in caplog.records] == [
+        "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: status is 'À valider'",
+        "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: both perim_donnees_publiees and perim_donnees_informatives are not set",
+    ]
+
+
+@responses.activate
 def test_check_constent_validation_preuve(grdf, caplog):
     access = dict(ACCESS_PAYLOAD)
     access["statut_controle_preuve"] = "Preuve en attente"

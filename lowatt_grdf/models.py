@@ -100,21 +100,23 @@ class Access(pydantic.BaseModel):
         name = self.raison_sociale_du_titulaire or self.nom_titulaire
         return f"<PCE {self.pce} from {name} ({self.courriel_titulaire})>"
 
-    def is_active(self) -> bool:
+    def is_active(self, log: bool = True) -> bool:
         """Return True if we can get data for this PCE"""
         if self.etat_droit_acces != "Active":
-            LOGGER.error(
-                "Could not collect data for %s: status is '%s'",
-                self,
-                self.etat_droit_acces,
-            )
+            if log:
+                LOGGER.error(
+                    "Could not collect data for %s: status is '%s'",
+                    self,
+                    self.etat_droit_acces,
+                )
             return False
         if not any([self.perim_donnees_publiees, self.perim_donnees_informatives]):
-            LOGGER.error(
-                "Could not collect data for %s: both perim_donnees_publiees and "
-                "perim_donnees_informatives are not set",
-                self,
-            )
+            if log:
+                LOGGER.error(
+                    "Could not collect data for %s: both perim_donnees_publiees and "
+                    "perim_donnees_informatives are not set",
+                    self,
+                )
             return False
         return True
 

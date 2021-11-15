@@ -133,8 +133,12 @@ class BaseAPI(metaclass=abc.ABCMeta):
             for access in accesses:
                 if not access.check_consent():
                     errors.append(access)
-                if access.is_active():
-                    LOGGER.info("Access to %s OK", access)
+
+            if any(access.is_active(log=False) for access in accesses):
+                LOGGER.info("Access to %s OK", accesses[0])
+            else:
+                for access in accesses:
+                    access.is_active(log=True)
         if errors:
             raise RuntimeError(f"Theses consents have validation issues: {errors!r}")
 
