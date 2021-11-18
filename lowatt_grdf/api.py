@@ -117,18 +117,28 @@ class BaseAPI(metaclass=abc.ABCMeta):
         resp = self.droits_acces(pce)
         # XXX: this looks like a bug, "liste_acces" should be part of the response
         if resp and "liste_acces" in resp[0]:
-            droits = resp[0]["liste_acces"]
+            items = resp[0]["liste_acces"]
         else:
-            droits = resp
-        errors = []
-        for droit in droits:
-            if "code_statut_traitement" in droit:
+            items = resp
+        droits: Dict[str, List[models.Access]] = {}
+        for item in items:
+            if "code_statut_traitement" in item:
                 continue
-            access = models.Access(**parse_grdf_bool(droit))
-            if not access.check_consent():
-                errors.append(droit)
-            if access.is_active():
-                LOGGER.info("Access to %s OK", access)
+            access = models.Access(**parse_grdf_bool(item))
+            droits.setdefault(access.pce, []).append(access)
+        errors = []
+        for _, accesses in sorted(
+            droits.items(), key=lambda x: (x[1][0].courriel_titulaire, x[0])
+        ):
+            for access in accesses:
+                if not access.check_consent():
+                    errors.append(access)
+
+            if any(access.is_active(log=False) for access in accesses):
+                LOGGER.info("Access to %s OK", accesses[0])
+            else:
+                for access in accesses:
+                    access.is_active(log=True)
         if errors:
             raise RuntimeError(f"Theses consents have validation issues: {errors!r}")
 
