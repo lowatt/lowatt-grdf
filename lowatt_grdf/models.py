@@ -91,6 +91,7 @@ class Access(pydantic.BaseModel):
     etat_droit_acces: str
     perim_donnees_publiees: bool
     perim_donnees_informatives: bool
+    perim_donnees_techniques_et_contractuelles: bool
     courriel_titulaire: str
     raison_sociale_du_titulaire: Optional[str]
     nom_titulaire: Optional[str]
