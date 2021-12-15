@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+import logging
 
 import ndjson
 import pytest
@@ -26,7 +27,7 @@ from lowatt_grdf import api, models
 
 
 @pytest.fixture
-def grdf():
+def grdf() -> api.API:
     responses.add(
         responses.POST,
         f"{api.OPENID_ENDPOINT}/access_token",
@@ -36,12 +37,12 @@ def grdf():
 
 
 @responses.activate
-def test_access_token(grdf):
+def test_access_token(grdf: api.API) -> None:
     assert grdf.access_token == "xxx"
 
 
 @responses.activate
-def test_donnees_contractuelles(grdf):
+def test_donnees_contractuelles(grdf: api.API) -> None:
     payload = {
         "pce": {"id_pce": "23000000000000"},
         "donnees_contractuelles": {
@@ -62,7 +63,7 @@ def test_donnees_contractuelles(grdf):
 
 
 @responses.activate
-def test_donnees_techniques(grdf):
+def test_donnees_techniques(grdf: api.API) -> None:
     payload = {
         "pce": {"id_pce": "23000000000000"},
         "donnees_techniques": {
@@ -119,7 +120,7 @@ ACCESS_PAYLOAD = {
 
 
 @responses.activate
-def test_droits_acces(grdf):
+def test_droits_acces(grdf: api.API) -> None:
     payload = [
         ACCESS_PAYLOAD,
         {
@@ -137,7 +138,9 @@ def test_droits_acces(grdf):
 
 
 @responses.activate
-def test_check_constent_validation_ok(grdf, caplog):
+def test_check_constent_validation_ok(
+    grdf: api.API, caplog: pytest.LogCaptureFixture
+) -> None:
     payload = [
         ACCESS_PAYLOAD,
         {
@@ -151,7 +154,7 @@ def test_check_constent_validation_ok(grdf, caplog):
         headers={"Content-Type": "application/nd-json"},
         body=ndjson.dumps(payload),
     )
-    with caplog.at_level("INFO", logger="lowatt.grdf"):
+    with caplog.at_level(logging.INFO, logger="lowatt.grdf"):
         grdf.check_consent_validation()
     assert [r.message for r in caplog.records] == [
         "Access to <PCE GI000000 from John Doe Inc. (jdoe@example.com)> OK",
@@ -159,7 +162,9 @@ def test_check_constent_validation_ok(grdf, caplog):
 
 
 @responses.activate
-def test_check_constent_validation_inactive(grdf, caplog):
+def test_check_constent_validation_inactive(
+    grdf: api.API, caplog: pytest.LogCaptureFixture
+) -> None:
     access = dict(ACCESS_PAYLOAD)
     access["etat_droit_acces"] = "À valider"
     payload = [
@@ -175,7 +180,7 @@ def test_check_constent_validation_inactive(grdf, caplog):
         headers={"Content-Type": "application/nd-json"},
         body=ndjson.dumps(payload),
     )
-    with caplog.at_level("INFO", logger="lowatt.grdf"):
+    with caplog.at_level(logging.INFO, logger="lowatt.grdf"):
         grdf.check_consent_validation()
     assert [r.message for r in caplog.records] == [
         "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: status is 'À valider'",
@@ -183,7 +188,9 @@ def test_check_constent_validation_inactive(grdf, caplog):
 
 
 @responses.activate
-def test_check_constent_multiple_ok(grdf, caplog):
+def test_check_constent_multiple_ok(
+    grdf: api.API, caplog: pytest.LogCaptureFixture
+) -> None:
     access = dict(ACCESS_PAYLOAD)
     access["etat_droit_acces"] = "À valider"
     payload = [
@@ -200,7 +207,7 @@ def test_check_constent_multiple_ok(grdf, caplog):
         headers={"Content-Type": "application/nd-json"},
         body=ndjson.dumps(payload),
     )
-    with caplog.at_level("INFO", logger="lowatt.grdf"):
+    with caplog.at_level(logging.INFO, logger="lowatt.grdf"):
         grdf.check_consent_validation()
     assert [r.message for r in caplog.records] == [
         "Access to <PCE GI000000 from John Doe Inc. (jdoe@example.com)> OK",
@@ -208,7 +215,9 @@ def test_check_constent_multiple_ok(grdf, caplog):
 
 
 @responses.activate
-def test_check_constent_multiple_ko(grdf, caplog):
+def test_check_constent_multiple_ko(
+    grdf: api.API, caplog: pytest.LogCaptureFixture
+) -> None:
     access1 = dict(ACCESS_PAYLOAD)
     access1["etat_droit_acces"] = "À valider"
     access2 = dict(ACCESS_PAYLOAD)
@@ -228,7 +237,7 @@ def test_check_constent_multiple_ko(grdf, caplog):
         headers={"Content-Type": "application/nd-json"},
         body=ndjson.dumps(payload),
     )
-    with caplog.at_level("INFO", logger="lowatt.grdf"):
+    with caplog.at_level(logging.INFO, logger="lowatt.grdf"):
         grdf.check_consent_validation()
     assert [r.message for r in caplog.records] == [
         "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: status is 'À valider'",
@@ -237,7 +246,9 @@ def test_check_constent_multiple_ko(grdf, caplog):
 
 
 @responses.activate
-def test_check_constent_validation_preuve(grdf, caplog):
+def test_check_constent_validation_preuve(
+    grdf: api.API, caplog: pytest.LogCaptureFixture
+) -> None:
     access = dict(ACCESS_PAYLOAD)
     access["statut_controle_preuve"] = "Preuve en attente"
     payload = [
@@ -253,7 +264,7 @@ def test_check_constent_validation_preuve(grdf, caplog):
         headers={"Content-Type": "application/nd-json"},
         body=ndjson.dumps(payload),
     )
-    with caplog.at_level("INFO", logger="lowatt.grdf"), pytest.raises(
+    with caplog.at_level(logging.INFO, logger="lowatt.grdf"), pytest.raises(
         RuntimeError, match="Theses consents have validation issues"
     ):
         grdf.check_consent_validation()
@@ -264,7 +275,7 @@ def test_check_constent_validation_preuve(grdf, caplog):
 
 
 @responses.activate
-def test_donnees_consos_publiees(grdf):
+def test_donnees_consos_publiees(grdf: api.API) -> None:
     payload = [
         {
             "pce": {"id_pce": "23000000000000"},
@@ -338,7 +349,7 @@ def test_donnees_consos_publiees(grdf):
 
 
 @responses.activate
-def test_donnees_consos_informatives(grdf):
+def test_donnees_consos_informatives(grdf: api.API) -> None:
     payload = [
         {
             "pce": {"id_pce": "23000000000000"},
@@ -396,7 +407,7 @@ def test_donnees_consos_informatives(grdf):
 
 
 @responses.activate
-def test_declare_acces(grdf, caplog):
+def test_declare_acces(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
     access = models.DeclareAccess(
         pce="23000000000000",
         nom_titulaire="jdoe",
@@ -407,7 +418,7 @@ def test_declare_acces(grdf, caplog):
     )
     # XXX: use a real life response
     responses.add(responses.PUT, f"{grdf.api}/pce/23000000000000/droit_acces", json={})
-    with caplog.at_level("INFO", logger="lowatt.grdf"):
+    with caplog.at_level(logging.INFO, logger="lowatt.grdf"):
         grdf.declare_acces(access)
     assert [r.message for r in caplog.records] == [
         "Successfully declared access to 23000000000000",
