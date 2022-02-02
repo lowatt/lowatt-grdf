@@ -151,14 +151,14 @@ class BaseAPI(metaclass=abc.ABCMeta):
         )
         LOGGER.info("Successfully declared access to %s", access.pce)
 
-    def donnees_consos_publiees(self, pce: str, from_date: str, to_date: str, periode: str = None) -> Any:
+    def donnees_consos_publiees(
+        self, pce: str, from_date: str = None, to_date: str = None, periode: str = None
+    ) -> Any:
         endpoint = f"{self.api}/pce/{pce}/donnees_consos_publiees"
         if periode:
             return self.get(
                 endpoint,
-                params={
-                    "periode": periode
-                },
+                params={"periode": periode},
             )
 
         return self.get(
