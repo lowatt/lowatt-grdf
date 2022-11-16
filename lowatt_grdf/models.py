@@ -42,10 +42,13 @@ class DeclareAccess(pydantic.BaseModel):
     code_postal: str
     courriel_titulaire: str
     date_consentement_declaree: str
-    date_fin_autorisation_demandee: str
-    perim_donnees_techniques_et_contractuelles: bool = False
-    perim_historique_de_donnees: bool = False
-    perim_flux_de_donnees: bool = False
+    numero_telephone_titulaire: Optional[str] = None
+    date_debut_droit_acces: str
+    date_fin_droit_acces: str
+    perim_donnees_conso_debut: str
+    perim_donnees_conso_fin: str
+    perim_donnees_contractuelles: bool = False
+    perim_donnees_techniques: bool = False
     perim_donnees_informatives: bool = False
     perim_donnees_publiees: bool = False
 
@@ -59,9 +62,7 @@ class DeclareAccess(pydantic.BaseModel):
         values: Dict[str, str],
     ) -> Dict[str, str]:
         if not any(values.get(k) for k in ("raison_sociale", "nom_titulaire")):
-            raise ValueError(
-                "One of raison-sociale or nom-titulaire should be specified"
-            )
+            raise ValueError("One of raison-sociale or nom-titulaire should be specified")
         return values
 
     @pydantic.root_validator()
@@ -69,7 +70,13 @@ class DeclareAccess(pydantic.BaseModel):
         cls,  # noqa: B902 (Invalid first argument 'cls' used for instance method.)
         values: Dict[str, str],
     ) -> Dict[str, str]:
-        for param in "date_consentement_declaree", "date_fin_autorisation_demandee":
+        for param in [
+            "date_consentement_declaree",
+            "date_debut_droit_acces",
+            "date_fin_droit_acces",
+            "perim_donnees_conso_debut",
+            "perim_donnees_conso_fin",
+        ]:
             _validate_date_format(param, values[param])
         # Expect a datetime while it seems more consistent to use a simple date.
         values["date_consentement_declaree"] += " 00:00:00"
@@ -81,9 +88,7 @@ def _validate_date_format(param: str, value: str) -> None:
     try:
         time.strptime(value, "%Y-%m-%d")
     except ValueError as exc:
-        raise ValueError(
-            f"format of {param} must be 'YYYY-MM-DD', got {value}"
-        ) from exc
+        raise ValueError(f"format of {param} must be 'YYYY-MM-DD', got {value}") from exc
 
 
 class Access(pydantic.BaseModel):
@@ -91,11 +96,18 @@ class Access(pydantic.BaseModel):
     etat_droit_acces: str
     perim_donnees_publiees: bool
     perim_donnees_informatives: bool
-    perim_donnees_techniques_et_contractuelles: bool
     courriel_titulaire: str
     raison_sociale_du_titulaire: Optional[str]
     nom_titulaire: Optional[str]
     statut_controle_preuve: Optional[str]
+    date_consentement_declaree: Optional[str] = None
+    numero_telephone_titulaire: Optional[str] = None
+    date_debut_droit_acces: str
+    date_fin_droit_acces: str
+    perim_donnees_conso_debut: str
+    perim_donnees_conso_fin: str
+    perim_donnees_contractuelles: bool = False
+    perim_donnees_techniques: bool = False
 
     def __str__(self) -> str:
         name = self.raison_sociale_du_titulaire or self.nom_titulaire
