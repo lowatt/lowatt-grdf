@@ -106,7 +106,7 @@ class Access(pydantic.BaseModel):
         if self.etat_droit_acces != "Active":
             if log:
                 LOGGER.error(
-                    "Could not collect data for %s: status is '%s'",
+                    "Could not collect data for %s: etat_droit_acces is '%s'",
                     self,
                     self.etat_droit_acces,
                 )
