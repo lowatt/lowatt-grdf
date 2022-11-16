@@ -67,11 +67,16 @@ Options:
   --courriel-titulaire TEXT       [required]
   --date-consentement-declaree YYYY-MM-DD
                                   [required]
-  --date-fin-autorisation-demandee YYYY-MM-DD
+  --numero-telephone-titulaire TEXT
+  --date-debut-droit-acces YYYY-MM-DD
                                   [required]
-  --perim-donnees-techniques-et-contractuelles
-  --perim-historique-de-donnees
-  --perim-flux-de-donnees
+  --date-fin-droit-acces YYYY-MM-DD
+                                  [required]
+  --perim-donnees-conso-debut TEXT
+                                  [required]
+  --perim-donnees-conso-fin TEXT  [required]
+  --perim-donnees-contractuelles
+  --perim-donnees-techniques
   --perim-donnees-informatives
   --perim-donnees-publiees
   -h, --help                      Show this message and exit.

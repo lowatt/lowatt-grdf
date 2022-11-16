@@ -99,12 +99,16 @@ ACCESS_PAYLOAD = {
     "raison_sociale_du_titulaire": "John Doe Inc.",
     "courriel_titulaire": "jdoe@example.com",
     "code_postal": "99099",
-    "perim_donnees_techniques_et_contractuelles": "Vrai",
-    "perim_historique_de_donnees": "Vrai",
-    "perim_flux_de_donnees": "Vrai",
+    "numero_telephone_titulaire": "0600000000",
     "perim_donnees_informatives": "Vrai",
+    "perim_donnees_contractuelles": "Vrai",
+    "perim_donnees_techniques:": "Vrai",
+    "perim_donnees_conso_debut": "2020-01-01",
+    "perim_donnees_conso_fin": "2025-01-01",
     "perim_donnees_publiees": "Vrai",
     "date_creation": "2021-07-02 16:41:14",
+    "date_debut_droit_acces": "2021-07-02",
+    "date_fin_droit_acces": "2030-01-01",
     "etat_droit_acces": "Active",
     "date_revocation": None,
     "source_revocation": None,
@@ -116,6 +120,7 @@ ACCESS_PAYLOAD = {
     "parcours": "CLIENT_CONNECT",
     "statut_controle_preuve": None,
     "date_limite_transmission_preuve": None,
+    "date_consentement_declaree": None,
 }
 
 
@@ -138,9 +143,7 @@ def test_droits_acces(grdf: api.API) -> None:
 
 
 @responses.activate
-def test_check_constent_validation_ok(
-    grdf: api.API, caplog: pytest.LogCaptureFixture
-) -> None:
+def test_check_constent_validation_ok(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
     payload = [
         ACCESS_PAYLOAD,
         {
@@ -188,9 +191,7 @@ def test_check_constent_validation_inactive(
 
 
 @responses.activate
-def test_check_constent_multiple_ok(
-    grdf: api.API, caplog: pytest.LogCaptureFixture
-) -> None:
+def test_check_constent_multiple_ok(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
     access = dict(ACCESS_PAYLOAD)
     access["etat_droit_acces"] = "À valider"
     payload = [
@@ -215,9 +216,7 @@ def test_check_constent_multiple_ok(
 
 
 @responses.activate
-def test_check_constent_multiple_ko(
-    grdf: api.API, caplog: pytest.LogCaptureFixture
-) -> None:
+def test_check_constent_multiple_ko(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
     access1 = dict(ACCESS_PAYLOAD)
     access1["etat_droit_acces"] = "À valider"
     access2 = dict(ACCESS_PAYLOAD)
@@ -246,9 +245,7 @@ def test_check_constent_multiple_ko(
 
 
 @responses.activate
-def test_check_constent_validation_preuve(
-    grdf: api.API, caplog: pytest.LogCaptureFixture
-) -> None:
+def test_check_constent_validation_preuve(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
     access = dict(ACCESS_PAYLOAD)
     access["statut_controle_preuve"] = "Preuve en attente"
     payload = [
@@ -413,8 +410,13 @@ def test_declare_acces(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
         nom_titulaire="jdoe",
         code_postal="99099",
         courriel_titulaire="jdoe@example.com",
+        numero_telephone_titulaire="0600000000",
+        date_debut_droit_acces="2020-01-01",
+        date_fin_droit_acces="2025-12-31",
+        perim_donnees_conso_debut="2020-01-01",
+        perim_donnees_conso_fin="2020-01-01",
+        raison_sociale="dummy",
         date_consentement_declaree="2020-01-01",
-        date_fin_autorisation_demandee="2023-01-01",
     )
     # XXX: use a real life response
     responses.add(responses.PUT, f"{grdf.api}/pce/23000000000000/droit_acces", json={})
