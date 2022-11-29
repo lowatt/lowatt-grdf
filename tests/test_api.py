@@ -143,7 +143,9 @@ def test_droits_acces(grdf: api.API) -> None:
 
 
 @responses.activate
-def test_check_constent_validation_ok(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
+def test_check_constent_validation_ok(
+    grdf: api.API, caplog: pytest.LogCaptureFixture
+) -> None:
     payload = [
         ACCESS_PAYLOAD,
         {
@@ -191,7 +193,9 @@ def test_check_constent_validation_inactive(
 
 
 @responses.activate
-def test_check_constent_multiple_ok(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
+def test_check_constent_multiple_ok(
+    grdf: api.API, caplog: pytest.LogCaptureFixture
+) -> None:
     access = dict(ACCESS_PAYLOAD)
     access["etat_droit_acces"] = "À valider"
     payload = [
@@ -216,7 +220,9 @@ def test_check_constent_multiple_ok(grdf: api.API, caplog: pytest.LogCaptureFixt
 
 
 @responses.activate
-def test_check_constent_multiple_ko(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
+def test_check_constent_multiple_ko(
+    grdf: api.API, caplog: pytest.LogCaptureFixture
+) -> None:
     access1 = dict(ACCESS_PAYLOAD)
     access1["etat_droit_acces"] = "À valider"
     access2 = dict(ACCESS_PAYLOAD)
@@ -245,7 +251,9 @@ def test_check_constent_multiple_ko(grdf: api.API, caplog: pytest.LogCaptureFixt
 
 
 @responses.activate
-def test_check_constent_validation_preuve(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
+def test_check_constent_validation_preuve(
+    grdf: api.API, caplog: pytest.LogCaptureFixture
+) -> None:
     access = dict(ACCESS_PAYLOAD)
     access["statut_controle_preuve"] = "Preuve en attente"
     payload = [

@@ -62,7 +62,9 @@ class DeclareAccess(pydantic.BaseModel):
         values: Dict[str, str],
     ) -> Dict[str, str]:
         if not any(values.get(k) for k in ("raison_sociale", "nom_titulaire")):
-            raise ValueError("One of raison-sociale or nom-titulaire should be specified")
+            raise ValueError(
+                "One of raison-sociale or nom-titulaire should be specified"
+            )
         return values
 
     @pydantic.root_validator()
@@ -88,7 +90,9 @@ def _validate_date_format(param: str, value: str) -> None:
     try:
         time.strptime(value, "%Y-%m-%d")
     except ValueError as exc:
-        raise ValueError(f"format of {param} must be 'YYYY-MM-DD', got {value}") from exc
+        raise ValueError(
+            f"format of {param} must be 'YYYY-MM-DD', got {value}"
+        ) from exc
 
 
 class Access(pydantic.BaseModel):
