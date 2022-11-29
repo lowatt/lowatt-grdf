@@ -20,14 +20,14 @@
 
 import json
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import pydantic
 
 from . import LOGGER
 
 
-def grdf_json_dumps(v: Dict[str, Any], *, default: Any) -> Any:
+def grdf_json_dumps(v: dict[str, Any], *, default: Any) -> Any:
     for key, value in v.items():
         if isinstance(value, bool):
             v[key] = "Vrai" if value else "Faux"
@@ -59,17 +59,19 @@ class DeclareAccess(pydantic.BaseModel):
     @pydantic.root_validator()
     def check_oneof_nom_or_raison_sociale(
         cls,  # noqa: B902 (Invalid first argument 'cls' used for instance method.)
-        values: Dict[str, str],
-    ) -> Dict[str, str]:
+        values: dict[str, str],
+    ) -> dict[str, str]:
         if not any(values.get(k) for k in ("raison_sociale", "nom_titulaire")):
-            raise ValueError("One of raison-sociale or nom-titulaire should be specified")
+            raise ValueError(
+                "One of raison-sociale or nom-titulaire should be specified"
+            )
         return values
 
     @pydantic.root_validator()
     def check_date_format(
         cls,  # noqa: B902 (Invalid first argument 'cls' used for instance method.)
-        values: Dict[str, str],
-    ) -> Dict[str, str]:
+        values: dict[str, str],
+    ) -> dict[str, str]:
         for param in [
             "date_consentement_declaree",
             "date_debut_droit_acces",
@@ -88,7 +90,9 @@ def _validate_date_format(param: str, value: str) -> None:
     try:
         time.strptime(value, "%Y-%m-%d")
     except ValueError as exc:
-        raise ValueError(f"format of {param} must be 'YYYY-MM-DD', got {value}") from exc
+        raise ValueError(
+            f"format of {param} must be 'YYYY-MM-DD', got {value}"
+        ) from exc
 
 
 class Access(pydantic.BaseModel):

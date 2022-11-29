@@ -143,7 +143,9 @@ def test_droits_acces(grdf: api.API) -> None:
 
 
 @responses.activate
-def test_check_constent_validation_ok(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
+def test_check_constent_validation_ok(
+    grdf: api.API, caplog: pytest.LogCaptureFixture
+) -> None:
     payload = [
         ACCESS_PAYLOAD,
         {
@@ -186,12 +188,14 @@ def test_check_constent_validation_inactive(
     with caplog.at_level(logging.INFO, logger="lowatt.grdf"):
         grdf.check_consent_validation()
     assert [r.message for r in caplog.records] == [
-        "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: status is 'À valider'",
+        "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: etat_droit_acces is 'À valider'",
     ]
 
 
 @responses.activate
-def test_check_constent_multiple_ok(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
+def test_check_constent_multiple_ok(
+    grdf: api.API, caplog: pytest.LogCaptureFixture
+) -> None:
     access = dict(ACCESS_PAYLOAD)
     access["etat_droit_acces"] = "À valider"
     payload = [
@@ -216,7 +220,9 @@ def test_check_constent_multiple_ok(grdf: api.API, caplog: pytest.LogCaptureFixt
 
 
 @responses.activate
-def test_check_constent_multiple_ko(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
+def test_check_constent_multiple_ko(
+    grdf: api.API, caplog: pytest.LogCaptureFixture
+) -> None:
     access1 = dict(ACCESS_PAYLOAD)
     access1["etat_droit_acces"] = "À valider"
     access2 = dict(ACCESS_PAYLOAD)
@@ -239,13 +245,15 @@ def test_check_constent_multiple_ko(grdf: api.API, caplog: pytest.LogCaptureFixt
     with caplog.at_level(logging.INFO, logger="lowatt.grdf"):
         grdf.check_consent_validation()
     assert [r.message for r in caplog.records] == [
-        "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: status is 'À valider'",
+        "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: etat_droit_acces is 'À valider'",
         "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: both perim_donnees_publiees and perim_donnees_informatives are not set",
     ]
 
 
 @responses.activate
-def test_check_constent_validation_preuve(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
+def test_check_constent_validation_preuve(
+    grdf: api.API, caplog: pytest.LogCaptureFixture
+) -> None:
     access = dict(ACCESS_PAYLOAD)
     access["statut_controle_preuve"] = "Preuve en attente"
     payload = [
