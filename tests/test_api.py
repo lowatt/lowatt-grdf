@@ -188,7 +188,7 @@ def test_check_constent_validation_inactive(
     with caplog.at_level(logging.INFO, logger="lowatt.grdf"):
         grdf.check_consent_validation()
     assert [r.message for r in caplog.records] == [
-        "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: status is 'À valider'",
+        "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: etat_droit_acces is 'À valider'",
     ]
 
 
@@ -245,7 +245,7 @@ def test_check_constent_multiple_ko(
     with caplog.at_level(logging.INFO, logger="lowatt.grdf"):
         grdf.check_consent_validation()
     assert [r.message for r in caplog.records] == [
-        "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: status is 'À valider'",
+        "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: etat_droit_acces is 'À valider'",
         "Could not collect data for <PCE GI000000 from John Doe Inc. (jdoe@example.com)>: both perim_donnees_publiees and perim_donnees_informatives are not set",
     ]
 
