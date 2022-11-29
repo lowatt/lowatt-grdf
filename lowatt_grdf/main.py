@@ -22,7 +22,7 @@ import json
 import logging
 import os
 import sys
-from typing import Any, Callable, Type
+from typing import Any, Callable, Tuple, Type
 
 import click
 import pydantic
@@ -104,7 +104,7 @@ def main() -> None:
 )
 @api_options
 def droits_acces(
-    client_id: str, client_secret: str, bas: bool, pce: tuple[str], check: bool
+    client_id: str, client_secret: str, bas: bool, pce: Tuple[str], check: bool
 ) -> None:
     grdf = {True: api.StagingAPI, False: api.API}[bas](client_id, client_secret)
     if check:
