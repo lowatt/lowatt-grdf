@@ -1,7 +1,7 @@
 # lowatt-grdf
 
 A command-line tool and Python library to access
-[GrDF Addict](https://sites.grdf.fr/web/portail-api-grdf-adict) API, provided by
+[GrDF Adict](https://sites.grdf.fr/web/portail-api-grdf-adict) API, provided by
 [Lowatt](https://www.lowatt.fr).
 
 ## Licensing
