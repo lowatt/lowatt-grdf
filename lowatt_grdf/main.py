@@ -18,7 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import json
 import logging
 import os
 import sys
@@ -27,6 +26,7 @@ from typing import Any, Callable, Tuple, Type
 import click
 import pydantic
 import requests
+import rich
 
 from . import LOGGER, api, models
 
@@ -110,7 +110,7 @@ def droits_acces(
     if check:
         grdf.check_consent_validation(list(pce))
     else:
-        json.dump(grdf.droits_acces(list(pce)), sys.stdout)
+        rich.print_json(data=grdf.droits_acces(list(pce)))
 
 
 @main.command()
@@ -127,7 +127,7 @@ def donnees_consos_publiees(
     to_date: str,
 ) -> None:
     grdf = {True: api.StagingAPI, False: api.API}[bas](client_id, client_secret)
-    json.dump(grdf.donnees_consos_publiees(pce, from_date, to_date), sys.stdout)
+    rich.print_json(data=grdf.donnees_consos_publiees(pce, from_date, to_date))
 
 
 @main.command()
@@ -144,7 +144,7 @@ def donnees_consos_informatives(
     to_date: str,
 ) -> None:
     grdf = {True: api.StagingAPI, False: api.API}[bas](client_id, client_secret)
-    json.dump(grdf.donnees_consos_informatives(pce, from_date, to_date), sys.stdout)
+    rich.print_json(data=grdf.donnees_consos_informatives(pce, from_date, to_date))
 
 
 @main.command()
@@ -157,7 +157,7 @@ def donnees_contractuelles(
     pce: str,
 ) -> None:
     grdf = {True: api.StagingAPI, False: api.API}[bas](client_id, client_secret)
-    json.dump(grdf.donnees_contractuelles(pce), sys.stdout)
+    rich.print_json(data=grdf.donnees_contractuelles(pce))
 
 
 @main.command()
@@ -170,7 +170,7 @@ def donnees_techniques(
     pce: str,
 ) -> None:
     grdf = {True: api.StagingAPI, False: api.API}[bas](client_id, client_secret)
-    json.dump(grdf.donnees_techniques(pce), sys.stdout)
+    rich.print_json(data=grdf.donnees_techniques(pce))
 
 
 @main.command()
