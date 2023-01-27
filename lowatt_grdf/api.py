@@ -21,7 +21,7 @@
 import abc
 import functools
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 import ndjson
 import requests
@@ -112,6 +112,49 @@ class BaseAPI(metaclass=abc.ABCMeta):
         if not pce:
             return self.get(f"{self.api}/droits_acces")
         return self.post(f"{self.api}/droits_acces", json={"id_pce": pce})
+
+    ThirdRole = Literal["AUTORISE_CONTRAT_FOURNITURE", "DETENTEUR_CONTRAT_FOURNITURE"]
+    AccessRightState = Literal[
+        "Active", "A valider", "Révoquée", "A revérifier", "Obsolète", "Refusée"
+    ]
+    ProofControlStatus = Literal[
+        "Preuve en attente",
+        "Preuve en cours de vérification",
+        "Preuve Vérifiée OK",
+        "Preuve Vérifiée KO",
+    ]
+
+    def droits_acces_specifiques(
+        self,
+        pce: Optional[List[str]] = None,
+        third_role: tuple[ThirdRole] = (
+            "AUTORISE_CONTRAT_FOURNITURE",
+            "DETENTEUR_CONTRAT_FOURNITURE",
+        ),
+        access_right_state: tuple[AccessRightState] = (
+            "Active",
+            "A valider",
+            "Révoquée",
+            "A revérifier",
+            "Obsolète",
+            "Refusée",
+        ),
+        proof_control_status: tuple[ProofControlStatus] = (
+            "Preuve en attente",
+            "Preuve en cours de vérification",
+            "Preuve Vérifiée OK",
+            "Preuve Vérifiée KO",
+        ),
+    ) -> Any:
+        return self.post(
+            f"{self.api}/droits_acces",
+            json={
+                "pce": pce,
+                "role_tiers": third_role,
+                "etat_droit_acces": access_right_state,
+                "statut_controle_preuve": proof_control_status,
+            },
+        )
 
     def check_consent_validation(self, pce: Optional[List[str]] = None) -> None:
         resp = self.droits_acces(pce)
