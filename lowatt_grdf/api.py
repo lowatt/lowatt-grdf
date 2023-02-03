@@ -21,7 +21,7 @@
 import abc
 import functools
 import time
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, get_args
 
 import ndjson
 import requests
@@ -114,37 +114,25 @@ class BaseAPI(metaclass=abc.ABCMeta):
         return self.post(f"{self.api}/droits_acces", json={"id_pce": pce})
 
     ThirdRole = Literal["AUTORISE_CONTRAT_FOURNITURE", "DETENTEUR_CONTRAT_FOURNITURE"]
+    DEFAULT_THIRD_ROLE = get_args(ThirdRole)
     AccessRightState = Literal[
         "Active", "A valider", "Révoquée", "A revérifier", "Obsolète", "Refusée"
     ]
+    DEFAULT_ACCESS_RIGHT_STATE = get_args(AccessRightState)
     ProofControlStatus = Literal[
         "Preuve en attente",
         "Preuve en cours de vérification",
         "Preuve Vérifiée OK",
         "Preuve Vérifiée KO",
     ]
+    DEFAULT_PROOF_CONTROL_STATUS = get_args(ProofControlStatus)
 
     def droits_acces_specifiques(
         self,
         pce: Optional[List[str]] = None,
-        third_role: tuple[ThirdRole] = (
-            "AUTORISE_CONTRAT_FOURNITURE",
-            "DETENTEUR_CONTRAT_FOURNITURE",
-        ),
-        access_right_state: tuple[AccessRightState] = (
-            "Active",
-            "A valider",
-            "Révoquée",
-            "A revérifier",
-            "Obsolète",
-            "Refusée",
-        ),
-        proof_control_status: tuple[ProofControlStatus] = (
-            "Preuve en attente",
-            "Preuve en cours de vérification",
-            "Preuve Vérifiée OK",
-            "Preuve Vérifiée KO",
-        ),
+        third_role: tuple[ThirdRole] = DEFAULT_THIRD_ROLE,  # type: ignore[assignment]
+        access_right_state: tuple[AccessRightState] = DEFAULT_ACCESS_RIGHT_STATE,  # type: ignore[assignment]
+        proof_control_status: tuple[ProofControlStatus] = DEFAULT_PROOF_CONTROL_STATUS,  # type: ignore[assignment]
     ) -> Any:
         return self.post(
             f"{self.api}/droits_acces",

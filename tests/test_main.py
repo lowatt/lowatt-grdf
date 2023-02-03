@@ -43,6 +43,7 @@ Commands:
   donnees-contractuelles
   donnees-techniques
   droits-acces
+  droits-acces-specifiques
 """
     )
 
