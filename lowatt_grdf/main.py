@@ -21,7 +21,7 @@
 import logging
 import os
 import sys
-from typing import Any, Callable, Tuple, Type
+from typing import Any, Callable, Type
 
 import click
 import pydantic
@@ -104,7 +104,7 @@ def main() -> None:
 )
 @api_options
 def droits_acces(
-    client_id: str, client_secret: str, bas: bool, pce: Tuple[str], check: bool
+    client_id: str, client_secret: str, bas: bool, pce: tuple[str], check: bool
 ) -> None:
     grdf = {True: api.StagingAPI, False: api.API}[bas](client_id, client_secret)
     if check:
@@ -131,7 +131,7 @@ def droits_acces_specifiques(
     client_id: str,
     client_secret: str,
     bas: bool,
-    pce: Tuple[str],
+    pce: tuple[str],
     role: tuple[api.BaseAPI.ThirdRole],
     etat: tuple[api.BaseAPI.AccessRightState],
     preuve: tuple[api.BaseAPI.ProofControlStatus],

@@ -21,7 +21,7 @@
 import abc
 import functools
 import time
-from typing import Any, Dict, List, Literal, Optional, get_args
+from typing import Any, Literal, Optional, get_args
 
 import ndjson
 import requests
@@ -31,7 +31,7 @@ from . import LOGGER, models
 OPENID_ENDPOINT = "https://sofit-sso-oidc.grdf.fr/openam/oauth2/realms/externeGrdf"
 
 
-def parse_grdf_bool(data: Dict[str, Any]) -> Dict[str, Any]:
+def parse_grdf_bool(data: dict[str, Any]) -> dict[str, Any]:
     """Turn 'Vrai' and 'Faux' items from input dict into regular booleans
 
     >>> parse_grdf_bool({"foo": "Vrai", "bar": "Faux"})
@@ -108,7 +108,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
         assert isinstance(token, str)
         return token
 
-    def droits_acces(self, pce: Optional[List[str]] = None) -> Any:
+    def droits_acces(self, pce: Optional[list[str]] = None) -> Any:
         if not pce:
             return self.get(f"{self.api}/droits_acces")
         return self.post(f"{self.api}/droits_acces", json={"id_pce": pce})
@@ -129,7 +129,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
 
     def droits_acces_specifiques(
         self,
-        pce: Optional[List[str]] = None,
+        pce: Optional[list[str]] = None,
         third_role: tuple[ThirdRole] = DEFAULT_THIRD_ROLE,  # type: ignore[assignment]
         access_right_state: tuple[AccessRightState] = DEFAULT_ACCESS_RIGHT_STATE,  # type: ignore[assignment]
         proof_control_status: tuple[ProofControlStatus] = DEFAULT_PROOF_CONTROL_STATUS,  # type: ignore[assignment]
@@ -144,14 +144,14 @@ class BaseAPI(metaclass=abc.ABCMeta):
             },
         )
 
-    def check_consent_validation(self, pce: Optional[List[str]] = None) -> None:
+    def check_consent_validation(self, pce: Optional[list[str]] = None) -> None:
         resp = self.droits_acces(pce)
         # XXX: this looks like a bug, "liste_acces" should be part of the response
         if resp and "liste_acces" in resp[0]:
             items = resp[0]["liste_acces"]
         else:
             items = resp
-        droits: Dict[str, List[models.Access]] = {}
+        droits: dict[str, list[models.Access]] = {}
         for item in items:
             if "code_statut_traitement" in item:
                 continue
