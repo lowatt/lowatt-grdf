@@ -114,6 +114,40 @@ def droits_acces(
 
 
 @main.command()
+@click.argument("pce", nargs=-1)
+@click.option(
+    "--role", type=click.Choice(api.BaseAPI.DEFAULT_THIRD_ROLE), multiple=True
+)
+@click.option(
+    "--etat", type=click.Choice(api.BaseAPI.DEFAULT_ACCESS_RIGHT_STATE), multiple=True
+)
+@click.option(
+    "--preuve",
+    type=click.Choice(api.BaseAPI.DEFAULT_PROOF_CONTROL_STATUS),
+    multiple=True,
+)
+@api_options
+def droits_acces_specifiques(
+    client_id: str,
+    client_secret: str,
+    bas: bool,
+    pce: Tuple[str],
+    role: tuple[api.BaseAPI.ThirdRole],
+    etat: tuple[api.BaseAPI.AccessRightState],
+    preuve: tuple[api.BaseAPI.ProofControlStatus],
+) -> None:
+    grdf = {True: api.StagingAPI, False: api.API}[bas](client_id, client_secret)
+    rich.print_json(
+        data=grdf.droits_acces_specifiques(
+            list(pce),
+            third_role=role,
+            access_right_state=etat,
+            proof_control_status=preuve,
+        )
+    )
+
+
+@main.command()
 @click.argument("pce")
 @click.option("--from-date", required=True)
 @click.option("--to-date", required=True)
