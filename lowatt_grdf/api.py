@@ -137,7 +137,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
         return self.post(
             f"{self.api}/droits_acces",
             json={
-                "pce": pce,
+                "id_pce": pce,
                 "role_tiers": third_role,
                 "etat_droit_acces": access_right_state,
                 "statut_controle_preuve": proof_control_status,
