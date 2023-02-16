@@ -60,6 +60,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
         self.client_secret = client_secret
         self._access_token: Optional[str] = None
         self._last_request: Optional[float] = None
+        self._access_expires: Optional[float] = None
 
     def request(self, verb: str, *args: Any, **kwargs: Any) -> Any:
         headers = kwargs.setdefault("headers", {})
@@ -89,11 +90,11 @@ class BaseAPI(metaclass=abc.ABCMeta):
 
     @property
     def access_token(self) -> str:
-        if self._access_token is None:
-            self._access_token = self._authenticate()
+        if self._access_token is None || self._access_expires < time.time():
+            self._access_token, self._access_expires = self._authenticate()
         return self._access_token
 
-    def _authenticate(self) -> str:
+    def _authenticate(self) -> list[str]:
         resp = requests.post(
             f"{OPENID_ENDPOINT}/access_token",
             data={
@@ -104,9 +105,13 @@ class BaseAPI(metaclass=abc.ABCMeta):
             },
         )
         resp.raise_for_status()
-        token = resp.json()["access_token"]
+        data = resp.json()
+        token = data["access_token"]
         assert isinstance(token, str)
-        return token
+        expires_in = data["expires_in"]
+        assert isinstance(expires_in, int)
+        access_expires = time.time() + expires_in
+        return [token, access_expires]
 
     def droits_acces(self, pce: Optional[list[str]] = None) -> Any:
         if not pce:
