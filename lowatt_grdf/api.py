@@ -31,6 +31,18 @@ from . import LOGGER, models
 OPENID_ENDPOINT = "https://sofit-sso-oidc.grdf.fr/openam/oauth2/realms/externeGrdf"
 
 
+def raise_for_status(resp: requests.Response) -> None:
+    try:
+        resp.raise_for_status()
+    except requests.HTTPError:
+        try:
+            data = resp.json()
+        except requests.exceptions.JSONDecodeError:
+            data = resp.text
+        LOGGER.error(data)
+        raise
+
+
 def parse_grdf_bool(data: dict[str, Any]) -> dict[str, Any]:
     """Turn 'Vrai' and 'Faux' items from input dict into regular booleans
 
@@ -68,16 +80,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
             time.sleep(min(max(time.time() - self._last_request, 1), 1))
         resp = requests.request(verb, *args, **kwargs)
         self._last_request = time.time()
-        try:
-            resp.raise_for_status()
-        except requests.HTTPError:
-            try:
-                data = resp.json()
-            except Exception:
-                LOGGER.debug("No error details, response isn't JSON")
-            else:
-                LOGGER.error(data)
-            raise
+        raise_for_status(resp)
         # XXX: duno why but without strip it doesn't work.
         # Either an implementation error of ndjson module
         # or bad response from GrDF API (at least on staging environment)
@@ -103,7 +106,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
                 "scope": self.scope,
             },
         )
-        resp.raise_for_status()
+        raise_for_status(resp)
         token = resp.json()["access_token"]
         assert isinstance(token, str)
         return token
