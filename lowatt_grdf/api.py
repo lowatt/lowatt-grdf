@@ -90,7 +90,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
 
     @property
     def access_token(self) -> str:
-        if self._access_token is None || self._access_expires < time.time():
+        if self._access_token is None or self._access_expires < time.time():
             self._access_token, self._access_expires = self._authenticate()
         return self._access_token
 
