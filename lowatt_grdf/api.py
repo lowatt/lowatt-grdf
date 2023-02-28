@@ -94,7 +94,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
             self._access_token, self._access_expires = self._authenticate()
         return self._access_token
 
-    def _authenticate(self) -> list[str]:
+    def _authenticate(self) -> tuple[str, float]:
         resp = requests.post(
             f"{OPENID_ENDPOINT}/access_token",
             data={
