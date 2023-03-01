@@ -93,7 +93,9 @@ class BaseAPI(metaclass=abc.ABCMeta):
 
     @property
     def access_token(self) -> str:
-        if self._access_token is None or self._access_expires < time.time():
+        if self._access_token is None or (
+            self._access_expires is not None and self._access_expires < time.time()
+        ):
             self._access_token, self._access_expires = self._authenticate()
         return self._access_token
 
@@ -114,7 +116,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
         expires_in = data["expires_in"]
         assert isinstance(expires_in, int)
         access_expires = time.time() + expires_in
-        return [token, access_expires]
+        return (token, access_expires)
 
     def droits_acces(self, pce: Optional[list[str]] = None) -> Any:
         if not pce:
