@@ -31,7 +31,10 @@ def grdf() -> api.API:
     responses.add(
         responses.POST,
         f"{api.OPENID_ENDPOINT}/access_token",
-        json={"access_token": "xxx"},
+        json={
+            "access_token": "xxx",
+            "expires_in": 14400,
+        },
     )
     return api.API("id", "secret")
 
