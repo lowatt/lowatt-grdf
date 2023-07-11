@@ -21,10 +21,10 @@
 import logging
 import os
 import sys
-from typing import Any, Callable, Type
+from typing import Any, Callable, Union
 
+import attrs
 import click
-import pydantic
 import requests
 import rich
 
@@ -56,23 +56,22 @@ def api_options(func: Callback) -> Callback:
 
 
 def options_from_model(
-    model: Type[pydantic.BaseModel],
+    model: Any,
 ) -> Callable[[Callback], Callback]:
     def decorator(func: Callback) -> Callback:
-        for field in reversed(list(model.__fields__.values())):
+        for field in reversed(attrs.fields(model)):
             opt = field.alias.replace("_", "-")
             opt = f"--{opt}"
-            kwargs = {
-                "required": field.required,
-                "default": field.default,
-            }
-            if field.field_info.description is not None:
-                kwargs["help"] = field.field_info.description
-            if field.type_ == bool:
+            kwargs: dict[str, Union[str, bool]] = {}
+            if field.default == attrs.NOTHING:
+                kwargs["required"] = True
+            else:
+                kwargs.update(required=False, default=field.default)
+            if field.type == bool:
                 kwargs["is_flag"] = True
             if field.alias.startswith("date_"):
                 kwargs["metavar"] = "YYYY-MM-DD"
-            click.option(opt, **kwargs)(func)
+            click.option(opt, **kwargs)(func)  # type: ignore[arg-type]
         return func
 
     return decorator

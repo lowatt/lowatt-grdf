@@ -43,19 +43,6 @@ def raise_for_status(resp: requests.Response) -> None:
         raise
 
 
-def parse_grdf_bool(data: dict[str, Any]) -> dict[str, Any]:
-    """Turn 'Vrai' and 'Faux' items from input dict into regular booleans
-
-    >>> parse_grdf_bool({"foo": "Vrai", "bar": "Faux"})
-    {'foo': True, 'bar': False}
-    """
-    data = dict(data)
-    for key, value in data.items():
-        if isinstance(value, str) and value.lower() in ("vrai", "faux"):
-            data[key] = True if value.lower() == "vrai" else False
-    return data
-
-
 class BaseAPI(metaclass=abc.ABCMeta):
     @property
     @abc.abstractmethod
@@ -165,7 +152,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
         for item in items:
             if "code_statut_traitement" in item:
                 continue
-            access = models.Access(**parse_grdf_bool(item))
+            access = models.converter.structure(item, models.Access)
             droits.setdefault(access.pce, []).append(access)
         errors = []
         for _, accesses in sorted(
@@ -184,7 +171,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
             raise RuntimeError(f"Theses consents have validation issues: {errors!r}")
 
     def declare_acces(self, access: models.DeclareAccess) -> None:
-        data = access.json(exclude={"pce"}, exclude_none=True)
+        data = models.converter.dumps(access)
         self.put(
             f"{self.api}/pce/{access.pce}/droit_acces",
             headers={"Content-Type": "application/json"},

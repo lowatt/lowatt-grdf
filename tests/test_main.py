@@ -61,14 +61,10 @@ Options:
   --client-secret TEXT            openid client secret  [required]
   --client-id TEXT                openid client id  [required]
   --pce TEXT                      [required]
-  --role-tiers TEXT
-  --raison-sociale TEXT
-  --nom-titulaire TEXT
   --code-postal TEXT              [required]
   --courriel-titulaire TEXT       [required]
   --date-consentement-declaree YYYY-MM-DD
                                   [required]
-  --numero-telephone-titulaire TEXT
   --date-debut-droit-acces YYYY-MM-DD
                                   [required]
   --date-fin-droit-acces YYYY-MM-DD
@@ -76,6 +72,10 @@ Options:
   --perim-donnees-conso-debut TEXT
                                   [required]
   --perim-donnees-conso-fin TEXT  [required]
+  --raison-sociale TEXT
+  --nom-titulaire TEXT
+  --role-tiers TEXT
+  --numero-telephone-titulaire TEXT
   --perim-donnees-contractuelles
   --perim-donnees-techniques
   --perim-donnees-informatives
