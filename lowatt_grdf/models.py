@@ -18,85 +18,60 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import json
 import time
 from typing import Any, Optional
 
-import pydantic
+import attrs
+import cattrs
+import cattrs.gen
+import cattrs.preconf.json
 
 from . import LOGGER
 
 
-def grdf_json_dumps(v: dict[str, Any], *, default: Any) -> Any:
-    for key, value in v.items():
-        if isinstance(value, bool):
-            v[key] = "Vrai" if value else "Faux"
-    return json.dumps(v, default=default)
-
-
-class DeclareAccess(pydantic.BaseModel):
-    pce: str
-    role_tiers: str = "AUTORISE_CONTRAT_FOURNITURE"
-    raison_sociale: Optional[str]
-    nom_titulaire: Optional[str]
-    code_postal: str
-    courriel_titulaire: str
-    date_consentement_declaree: str
-    numero_telephone_titulaire: Optional[str] = None
-    date_debut_droit_acces: str
-    date_fin_droit_acces: str
-    perim_donnees_conso_debut: str
-    perim_donnees_conso_fin: str
-    perim_donnees_contractuelles: bool = False
-    perim_donnees_techniques: bool = False
-    perim_donnees_informatives: bool = False
-    perim_donnees_publiees: bool = False
-
-    class Config:
-        json_dumps = grdf_json_dumps
-        extra = "forbid"
-
-    @pydantic.root_validator()
-    def check_oneof_nom_or_raison_sociale(
-        cls,  # noqa: B902 (Invalid first argument 'cls' used for instance method.)
-        values: dict[str, str],
-    ) -> dict[str, str]:
-        if not any(values.get(k) for k in ("raison_sociale", "nom_titulaire")):
-            raise ValueError(
-                "One of raison-sociale or nom-titulaire should be specified"
-            )
-        return values
-
-    @pydantic.root_validator()
-    def check_date_format(
-        cls,  # noqa: B902 (Invalid first argument 'cls' used for instance method.)
-        values: dict[str, str],
-    ) -> dict[str, str]:
-        for param in [
-            "date_consentement_declaree",
-            "date_debut_droit_acces",
-            "date_fin_droit_acces",
-            "perim_donnees_conso_debut",
-            "perim_donnees_conso_fin",
-        ]:
-            _validate_date_format(param, values[param])
-        # Expect a datetime while it seems more consistent to use a simple date.
-        values["date_consentement_declaree"] += " 00:00:00"
-        return values
-
-
-def _validate_date_format(param: str, value: str) -> None:
+def validate_date_format(
+    instance: Any, attribute: "attrs.Attribute[str]", value: Any
+) -> None:
     assert isinstance(value, str), type(value)
     try:
         time.strptime(value, "%Y-%m-%d")
     except ValueError as exc:
         raise ValueError(
-            f"format of {param} must be 'YYYY-MM-DD', got {value}"
+            f"format of {attribute} must be 'YYYY-MM-DD', got {value}"
         ) from exc
 
 
-class Access(pydantic.BaseModel):
-    pce: str = pydantic.Field(alias="id_pce")
+class BaseModel:
+    pass
+
+
+@attrs.frozen
+class DeclareAccess(BaseModel):
+    pce: str
+    code_postal: str
+    courriel_titulaire: str
+    date_consentement_declaree: str = attrs.field(validator=validate_date_format)
+    date_debut_droit_acces: str = attrs.field(validator=validate_date_format)
+    date_fin_droit_acces: str = attrs.field(validator=validate_date_format)
+    perim_donnees_conso_debut: str = attrs.field(validator=validate_date_format)
+    perim_donnees_conso_fin: str = attrs.field(validator=validate_date_format)
+    raison_sociale: Optional[str] = None
+    nom_titulaire: Optional[str] = None
+    role_tiers: str = "AUTORISE_CONTRAT_FOURNITURE"
+    numero_telephone_titulaire: Optional[str] = None
+    perim_donnees_contractuelles: bool = False
+    perim_donnees_techniques: bool = False
+    perim_donnees_informatives: bool = False
+    perim_donnees_publiees: bool = False
+
+    def __attrs_post_init__(self) -> None:
+        if not self.raison_sociale and not self.nom_titulaire:
+            raise ValueError("One of raison-sociale or nom-titulaire must be specified")
+
+
+@attrs.frozen
+class Access(BaseModel):
+    pce: str
     etat_droit_acces: str
     perim_donnees_publiees: bool
     perim_donnees_informatives: bool
@@ -104,12 +79,12 @@ class Access(pydantic.BaseModel):
     raison_sociale_du_titulaire: Optional[str]
     nom_titulaire: Optional[str]
     statut_controle_preuve: Optional[str]
-    date_consentement_declaree: Optional[str] = None
-    numero_telephone_titulaire: Optional[str] = None
     date_debut_droit_acces: str
     date_fin_droit_acces: str
     perim_donnees_conso_debut: str
     perim_donnees_conso_fin: str
+    date_consentement_declaree: Optional[str] = None
+    numero_telephone_titulaire: Optional[str] = None
     perim_donnees_contractuelles: bool = False
     perim_donnees_techniques: bool = False
 
@@ -147,3 +122,50 @@ class Access(pydantic.BaseModel):
             )
             return False
         return True
+
+
+def structure_grdf_bool(value: Any, type_: Any) -> bool:
+    if not isinstance(value, str):
+        raise ValueError(f"Unhandled type {type(value)} for {value!r}")
+    if value.lower() == "vrai":
+        return True
+    if value.lower() == "faux":
+        return False
+    else:
+        raise ValueError(f"Unhandled value {value!r}")
+
+
+def unstructure_grdf_bool(value: bool) -> str:
+    return "Vrai" if value else "Faux"
+
+
+converter = cattrs.preconf.json.make_converter()
+converter.register_structure_hook(
+    Access,
+    cattrs.gen.make_dict_structure_fn(
+        Access,
+        cattrs.global_converter,
+        pce=cattrs.gen.override(rename="id_pce"),
+        **{
+            f.name: cattrs.gen.override(struct_hook=structure_grdf_bool)
+            for f in attrs.fields(Access)
+            if f.type == bool
+        },
+    ),
+)
+converter.register_unstructure_hook(
+    DeclareAccess,
+    cattrs.gen.make_dict_unstructure_fn(
+        DeclareAccess,
+        converter,
+        pce=cattrs.gen.override(omit=True),
+        date_consentement_declaree=cattrs.gen.override(
+            unstruct_hook=lambda v: v + " 00:00:00"
+        ),
+        **{
+            f.name: cattrs.gen.override(unstruct_hook=unstructure_grdf_bool)
+            for f in attrs.fields(Access)
+            if f.type == bool
+        },
+    ),
+)
