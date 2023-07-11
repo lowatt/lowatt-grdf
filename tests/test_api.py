@@ -17,6 +17,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+import json
 import logging
 
 import ndjson
@@ -354,6 +355,10 @@ def test_donnees_consos_publiees(grdf: api.API) -> None:
         )
         == payload
     )
+    assert (
+        responses.calls[-1].request.url
+        == "https://api.grdf.fr/adict/v2/pce/23000000000000/donnees_consos_publiees?date_debut=2021-01-01&date_fin=2021-01-23"
+    )
 
 
 @responses.activate
@@ -412,6 +417,10 @@ def test_donnees_consos_informatives(grdf: api.API) -> None:
         )
         == payload
     )
+    assert (
+        responses.calls[-1].request.url
+        == "https://api.grdf.fr/adict/v2/pce/23000000000000/donnees_consos_informatives?date_debut=2021-08-16&date_fin=2021-08-17"
+    )
 
 
 @responses.activate
@@ -433,6 +442,23 @@ def test_declare_acces(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
     responses.add(responses.PUT, f"{grdf.api}/pce/23000000000000/droit_acces", json={})
     with caplog.at_level(logging.INFO, logger="lowatt.grdf"):
         grdf.declare_acces(access)
+    assert json.loads(responses.calls[-1].request.body) == {
+        "code_postal": "99099",
+        "courriel_titulaire": "jdoe@example.com",
+        "date_consentement_declaree": "2020-01-01 00:00:00",
+        "date_debut_droit_acces": "2020-01-01",
+        "date_fin_droit_acces": "2025-12-31",
+        "nom_titulaire": "jdoe",
+        "numero_telephone_titulaire": "0600000000",
+        "perim_donnees_conso_debut": "2020-01-01",
+        "perim_donnees_conso_fin": "2020-01-01",
+        "perim_donnees_contractuelles": "Faux",
+        "perim_donnees_informatives": "Faux",
+        "perim_donnees_publiees": "Faux",
+        "perim_donnees_techniques": "Faux",
+        "raison_sociale": "dummy",
+        "role_tiers": "AUTORISE_CONTRAT_FOURNITURE",
+    }
     assert [r.message for r in caplog.records] == [
         "Successfully declared access to 23000000000000",
     ]
