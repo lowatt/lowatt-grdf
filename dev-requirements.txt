@@ -11,4 +11,5 @@ flake8-string-format
 check-manifest
 isort
 black
-
+pre-commit
+pyupgrade

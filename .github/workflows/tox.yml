@@ -35,7 +35,7 @@ jobs:
         if: ${{ contains(matrix.tox_env, 'py') }}
         run: |
           v = '${{ matrix.tox_env }}'.split('-')[0].lstrip('py')
-          print('::set-output name=version::{0}.{1}'.format(v[0],v[1:]))
+          print('::set-output name=version::{}.{}'.format(v[0],v[1:]))
       - name: Install a default Python
         uses: actions/setup-python@v2
         if: ${{ ! contains(matrix.tox_env, 'py') }}
