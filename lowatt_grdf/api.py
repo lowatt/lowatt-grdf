@@ -127,9 +127,9 @@ class BaseAPI(metaclass=abc.ABCMeta):
     def droits_acces_specifiques(
         self,
         pce: Optional[list[str]] = None,
-        third_role: tuple[ThirdRole] = DEFAULT_THIRD_ROLE,  # type: ignore[assignment]
-        access_right_state: tuple[AccessRightState] = DEFAULT_ACCESS_RIGHT_STATE,  # type: ignore[assignment]
-        proof_control_status: tuple[ProofControlStatus] = DEFAULT_PROOF_CONTROL_STATUS,  # type: ignore[assignment]
+        third_role: tuple[ThirdRole] = DEFAULT_THIRD_ROLE,
+        access_right_state: tuple[AccessRightState] = DEFAULT_ACCESS_RIGHT_STATE,
+        proof_control_status: tuple[ProofControlStatus] = DEFAULT_PROOF_CONTROL_STATUS,
     ) -> Any:
         return self.post(
             f"{self.api}/droits_acces",

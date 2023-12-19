@@ -442,7 +442,9 @@ def test_declare_acces(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
     responses.add(responses.PUT, f"{grdf.api}/pce/23000000000000/droit_acces", json={})
     with caplog.at_level(logging.INFO, logger="lowatt.grdf"):
         grdf.declare_acces(access)
-    assert json.loads(responses.calls[-1].request.body) == {
+    body = responses.calls[-1].request.body
+    assert body is not None
+    assert json.loads(body) == {
         "code_postal": "99099",
         "courriel_titulaire": "jdoe@example.com",
         "date_consentement_declaree": "2020-01-01 00:00:00",
