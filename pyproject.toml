@@ -1,7 +1,67 @@
 [build-system]
-requires = ["setuptools>=39.2.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lowatt-grdf"
+description = "Python client for GRDF ADICT API"
+readme = "README.md"
+license = { text = "GPLv3" }
+authors = [{ name = "Lowatt", email = "info@lowatt.fr" }]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3 :: Only",
+    "Operating System :: OS Independent",
+    "Topic :: System :: Archiving :: Mirroring",
+    "License :: OSI Approved :: MIT License",
+    "Typing :: Typed",
+]
+requires-python = ">=3.9"
+dynamic = ["version"]
+dependencies = [
+    "attrs",
+    "cattrs",
+    "click",
+    "ndjson",
+    "requests",
+    "rich",
+]
+
+[project.urls]
+Source = "https://github.com/lowatt/lowatt-grdf"
+Tracker = "https://github.com/lowatt/lowatt-grdf/issues"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "responses",
+]
+typing = [
+    "mypy",
+    "types-requests",
+]
+
+[project.scripts]
+lowatt-grdf = "lowatt_grdf.main:main"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+local_scheme = "no-local-version"
+
+[tool.black]
+target-version = ['py39']
+include = '\.pyi?$'
+exclude = '(\.tox|\.git)'
 
 [tool.isort]
 profile = "black"
 multi_line_output = 3
+known_first_party = ["lowatt_grdf"]
