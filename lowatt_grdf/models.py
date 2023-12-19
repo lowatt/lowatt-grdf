@@ -146,7 +146,7 @@ converter.register_structure_hook(
         Access,
         cattrs.global_converter,
         pce=cattrs.gen.override(rename="id_pce"),
-        **{
+        **{  # type: ignore[arg-type]
             f.name: cattrs.gen.override(struct_hook=structure_grdf_bool)
             for f in attrs.fields(Access)
             if f.type == bool
@@ -162,7 +162,7 @@ converter.register_unstructure_hook(
         date_consentement_declaree=cattrs.gen.override(
             unstruct_hook=lambda v: v + " 00:00:00"
         ),
-        **{
+        **{  # type: ignore[arg-type]
             f.name: cattrs.gen.override(unstruct_hook=unstructure_grdf_bool)
             for f in attrs.fields(Access)
             if f.type == bool
