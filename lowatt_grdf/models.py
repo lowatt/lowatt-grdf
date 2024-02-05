@@ -76,17 +76,23 @@ class Access(BaseModel):
     perim_donnees_publiees: bool
     perim_donnees_informatives: bool
     courriel_titulaire: str
-    raison_sociale_du_titulaire: Optional[str]
-    nom_titulaire: Optional[str]
     statut_controle_preuve: Optional[str]
     date_debut_droit_acces: str
     date_fin_droit_acces: str
     perim_donnees_conso_debut: str
     perim_donnees_conso_fin: str
+    raison_sociale_du_titulaire: Optional[str] = None
+    nom_titulaire: Optional[str] = None
     date_consentement_declaree: Optional[str] = None
     numero_telephone_titulaire: Optional[str] = None
     perim_donnees_contractuelles: bool = False
     perim_donnees_techniques: bool = False
+
+    def __attrs_post_init__(self) -> None:
+        if not self.raison_sociale_du_titulaire and not self.nom_titulaire:
+            raise ValueError(
+                "One of raison_sociale_du_titulaire or nom_titulaire is expected"
+            )
 
     def __str__(self) -> str:
         name = self.raison_sociale_du_titulaire or self.nom_titulaire

@@ -10,7 +10,6 @@ def test_structure_access() -> None:
             "date_debut_droit_acces": "2022-07-11",
             "date_fin_droit_acces": "2023-07-11",
             "statut_controle_preuve": None,
-            "nom_titulaire": None,
             "raison_sociale_du_titulaire": "COGIP",
             "courriel_titulaire": "cogip@example.com",
             "perim_donnees_informatives": "Vrai",
