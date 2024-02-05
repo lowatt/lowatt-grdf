@@ -273,8 +273,9 @@ def test_check_constent_validation_preuve(
         headers={"Content-Type": "application/nd-json"},
         body=ndjson.dumps(payload),
     )
-    with caplog.at_level(logging.INFO, logger="lowatt.grdf"), pytest.raises(
-        RuntimeError, match="Theses consents have validation issues"
+    with (
+        caplog.at_level(logging.INFO, logger="lowatt.grdf"),
+        pytest.raises(RuntimeError, match="Theses consents have validation issues"),
     ):
         grdf.check_consent_validation()
     assert [r.message for r in caplog.records] == [
