@@ -69,10 +69,10 @@ class BaseAPI(metaclass=abc.ABCMeta):
         resp = requests.request(verb, *args, **kwargs)
         self._last_request = time.time()
         raise_for_status(resp)
-        # XXX: duno why but without strip it doesn't work.
-        # Either an implementation error of ndjson module
-        # or bad response from GrDF API (at least on staging environment)
-        return ndjson.loads(resp.content.strip())
+        # XXX: Adjusts GRDF API responses to fit ndjson expected input because
+        # GRDF Staging API v6 responses contain multiple-lines JSON objects
+        # whereas ndjson expects one-line JSON objects
+        return ndjson.loads(resp.text.replace("\n", "").replace("}{", "}\n{"))
 
     get = functools.partialmethod(request, "GET")
     post = functools.partialmethod(request, "POST")
