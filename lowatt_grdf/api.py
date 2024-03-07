@@ -212,8 +212,8 @@ class BaseAPI(metaclass=abc.ABCMeta):
 
 
 class StagingAPI(BaseAPI):
-    scope = "/adict/bas/v4"
-    api = "https://api.grdf.fr/adict/bas/v4"
+    scope = "/adict/bas/v6"
+    api = "https://api.grdf.fr/adict/bas/v6"
 
 
 class API(BaseAPI):
