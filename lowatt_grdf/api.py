@@ -207,6 +207,22 @@ class BaseAPI(metaclass=abc.ABCMeta):
             },
         )
 
+    def donnees_injections_publiees(
+        self, pce: str, from_date: str, to_date: str
+    ) -> Any:
+        # XXX: Temporary fix for Staging API v6 that as an incorrect endpoint
+        endpoint = f"{self.api}/pce/{pce}/donnees_injections_publiees"
+        if self.scope == "/adict/bas/v6":
+            endpoint = f"{self.api}/pce/{pce}/donnees_injection_publiees"
+
+        return self.get(
+            endpoint,
+            params={
+                "date_debut": from_date,
+                "date_fin": to_date,
+            },
+        )
+
     def donnees_contractuelles(self, pce: str) -> Any:
         (payload,) = self.get(f"{self.api}/pce/{pce}/donnees_contractuelles")
         return payload
