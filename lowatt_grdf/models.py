@@ -32,6 +32,8 @@ from . import LOGGER
 def validate_date_format(
     instance: Any, attribute: "attrs.Attribute[str]", value: Any
 ) -> None:
+    if value is None:
+        return
     assert isinstance(value, str), type(value)
     try:
         time.strptime(value, "%Y-%m-%d")
@@ -50,15 +52,24 @@ class DeclareAccess(BaseModel):
     pce: str
     code_postal: str
     courriel_titulaire: str
-    date_consentement_declaree: str = attrs.field(validator=validate_date_format)
     date_debut_droit_acces: str = attrs.field(validator=validate_date_format)
     date_fin_droit_acces: str = attrs.field(validator=validate_date_format)
-    perim_donnees_conso_debut: str = attrs.field(validator=validate_date_format)
-    perim_donnees_conso_fin: str = attrs.field(validator=validate_date_format)
+    perim_donnees_conso_debut: Optional[str] = attrs.field(
+        validator=validate_date_format, default=None
+    )
+    perim_donnees_conso_fin: Optional[str] = attrs.field(
+        validator=validate_date_format, default=None
+    )
+    perim_donnees_inj_debut: Optional[str] = attrs.field(
+        validator=validate_date_format, default=None
+    )
+    perim_donnees_inj_fin: Optional[str] = attrs.field(
+        validator=validate_date_format, default=None
+    )
     raison_sociale: Optional[str] = None
     nom_titulaire: Optional[str] = None
     role_tiers: str = "AUTORISE_CONTRAT_FOURNITURE"
-    numero_telephone_titulaire: Optional[str] = None
+    numero_telephone_mobile_titulaire: Optional[str] = None
     perim_donnees_contractuelles: bool = False
     perim_donnees_techniques: bool = False
     perim_donnees_informatives: bool = False
@@ -67,6 +78,25 @@ class DeclareAccess(BaseModel):
     def __attrs_post_init__(self) -> None:
         if not self.raison_sociale and not self.nom_titulaire:
             raise ValueError("One of raison-sociale or nom-titulaire must be specified")
+
+        if "FOURNITURE" in self.role_tiers:
+            if not self.perim_donnees_conso_debut or not self.perim_donnees_conso_fin:
+                raise ValueError(
+                    f"Both perim-donnees-conso-debut and perim-donnees-conso-fin must be specified when role-tiers is set to {self.role_tiers}"
+                )
+            if self.perim_donnees_inj_debut or self.perim_donnees_inj_fin:
+                raise ValueError(
+                    f"Neither perim-donnees-inj-debut nor perim-donnees-inj-fin should be specified when role-tiers is set to {self.role_tiers}"
+                )
+        elif "INJECTION" in self.role_tiers:
+            if not self.perim_donnees_inj_debut or not self.perim_donnees_inj_fin:
+                raise ValueError(
+                    f"Both perim_donnees_inj_debut and perim_donnees_inj_fin must be specified when role-tiers is set to {self.role_tiers}"
+                )
+            if self.perim_donnees_conso_debut or self.perim_donnees_conso_fin:
+                raise ValueError(
+                    f"Neither perim_donnees_conso_debut nor perim_donnees_conso_fin should be specified when role-tiers is set to {self.role_tiers}"
+                )
 
 
 @attrs.frozen
@@ -79,12 +109,13 @@ class Access(BaseModel):
     statut_controle_preuve: Optional[str]
     date_debut_droit_acces: str
     date_fin_droit_acces: str
-    perim_donnees_conso_debut: str
-    perim_donnees_conso_fin: str
+    perim_donnees_conso_debut: Optional[str]
+    perim_donnees_conso_fin: Optional[str]
+    perim_donnees_inj_debut: Optional[str]
+    perim_donnees_inj_fin: Optional[str]
     raison_sociale_du_titulaire: Optional[str] = None
     nom_titulaire: Optional[str] = None
-    date_consentement_declaree: Optional[str] = None
-    numero_telephone_titulaire: Optional[str] = None
+    numero_telephone_mobile_titulaire: Optional[str] = None
     perim_donnees_contractuelles: bool = False
     perim_donnees_techniques: bool = False
 
@@ -165,12 +196,9 @@ converter.register_unstructure_hook(
         DeclareAccess,
         converter,
         pce=cattrs.gen.override(omit=True),
-        date_consentement_declaree=cattrs.gen.override(
-            unstruct_hook=lambda v: v + " 00:00:00"
-        ),
         **{  # type: ignore[arg-type]
             f.name: cattrs.gen.override(unstruct_hook=unstructure_grdf_bool)
-            for f in attrs.fields(Access)
+            for f in attrs.fields(DeclareAccess)
             if f.type == bool
         },
     ),

@@ -110,7 +110,12 @@ class BaseAPI(metaclass=abc.ABCMeta):
             return self.get(f"{self.api}/droits_acces")
         return self.post(f"{self.api}/droits_acces", json={"id_pce": pce})
 
-    ThirdRole = Literal["AUTORISE_CONTRAT_FOURNITURE", "DETENTEUR_CONTRAT_FOURNITURE"]
+    ThirdRole = Literal[
+        "AUTORISE_CONTRAT_FOURNITURE",
+        "DETENTEUR_CONTRAT_FOURNITURE",
+        "AUTORISE_CONTRAT_INJECTION",
+        "DETENTEUR_CONTRAT_INJECTION",
+    ]
     DEFAULT_THIRD_ROLE = get_args(ThirdRole)
     AccessRightState = Literal[
         "Active", "A valider", "Révoquée", "A revérifier", "Obsolète", "Refusée"
