@@ -103,12 +103,14 @@ ACCESS_PAYLOAD = {
     "raison_sociale_du_titulaire": "John Doe Inc.",
     "courriel_titulaire": "jdoe@example.com",
     "code_postal": "99099",
-    "numero_telephone_titulaire": "0600000000",
+    "numero_telephone_mobile_titulaire": "0600000000",
     "perim_donnees_informatives": "Vrai",
     "perim_donnees_contractuelles": "Vrai",
     "perim_donnees_techniques:": "Vrai",
     "perim_donnees_conso_debut": "2020-01-01",
     "perim_donnees_conso_fin": "2025-01-01",
+    "perim_donnees_inj_debut": None,
+    "perim_donnees_inj_fin": None,
     "perim_donnees_publiees": "Vrai",
     "date_creation": "2021-07-02 16:41:14",
     "date_debut_droit_acces": "2021-07-02",
@@ -124,7 +126,6 @@ ACCESS_PAYLOAD = {
     "parcours": "CLIENT_CONNECT",
     "statut_controle_preuve": None,
     "date_limite_transmission_preuve": None,
-    "date_consentement_declaree": None,
 }
 
 
@@ -431,13 +432,12 @@ def test_declare_acces(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
         nom_titulaire="jdoe",
         code_postal="99099",
         courriel_titulaire="jdoe@example.com",
-        numero_telephone_titulaire="0600000000",
+        numero_telephone_mobile_titulaire="0600000000",
         date_debut_droit_acces="2020-01-01",
         date_fin_droit_acces="2025-12-31",
         perim_donnees_conso_debut="2020-01-01",
         perim_donnees_conso_fin="2020-01-01",
         raison_sociale="dummy",
-        date_consentement_declaree="2020-01-01",
     )
     # XXX: use a real life response
     responses.add(responses.PUT, f"{grdf.api}/pce/23000000000000/droit_acces", json={})
@@ -448,13 +448,14 @@ def test_declare_acces(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
     assert json.loads(body) == {
         "code_postal": "99099",
         "courriel_titulaire": "jdoe@example.com",
-        "date_consentement_declaree": "2020-01-01 00:00:00",
         "date_debut_droit_acces": "2020-01-01",
         "date_fin_droit_acces": "2025-12-31",
         "nom_titulaire": "jdoe",
-        "numero_telephone_titulaire": "0600000000",
+        "numero_telephone_mobile_titulaire": "0600000000",
         "perim_donnees_conso_debut": "2020-01-01",
         "perim_donnees_conso_fin": "2020-01-01",
+        "perim_donnees_inj_debut": None,
+        "perim_donnees_inj_fin": None,
         "perim_donnees_contractuelles": "Faux",
         "perim_donnees_informatives": "Faux",
         "perim_donnees_publiees": "Faux",

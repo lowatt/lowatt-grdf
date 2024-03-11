@@ -69,10 +69,10 @@ class BaseAPI(metaclass=abc.ABCMeta):
         resp = requests.request(verb, *args, **kwargs)
         self._last_request = time.time()
         raise_for_status(resp)
-        # XXX: duno why but without strip it doesn't work.
-        # Either an implementation error of ndjson module
-        # or bad response from GrDF API (at least on staging environment)
-        return ndjson.loads(resp.content.strip())
+        # XXX: Adjusts GRDF API responses to fit ndjson expected input
+        # GRDF Staging API responses contain multiple-lines JSON objects
+        # whereas ndjson expects one-line JSON objects
+        return ndjson.loads(resp.text.replace("\n", "").replace("}{", "}\n{"))
 
     get = functools.partialmethod(request, "GET")
     post = functools.partialmethod(request, "POST")
@@ -110,7 +110,12 @@ class BaseAPI(metaclass=abc.ABCMeta):
             return self.get(f"{self.api}/droits_acces")
         return self.post(f"{self.api}/droits_acces", json={"id_pce": pce})
 
-    ThirdRole = Literal["AUTORISE_CONTRAT_FOURNITURE", "DETENTEUR_CONTRAT_FOURNITURE"]
+    ThirdRole = Literal[
+        "AUTORISE_CONTRAT_FOURNITURE",
+        "DETENTEUR_CONTRAT_FOURNITURE",
+        "AUTORISE_CONTRAT_INJECTION",
+        "DETENTEUR_CONTRAT_INJECTION",
+    ]
     DEFAULT_THIRD_ROLE = get_args(ThirdRole)
     AccessRightState = Literal[
         "Active", "A valider", "Révoquée", "A revérifier", "Obsolète", "Refusée"
@@ -202,6 +207,20 @@ class BaseAPI(metaclass=abc.ABCMeta):
             },
         )
 
+    def donnees_injections_publiees(self, pce: str, from_date: str, to_date: str) -> Any:
+        # XXX: Temporary fix for Staging API v6 that as an incorrect endpoint 
+        endpoint = f"{self.api}/pce/{pce}/donnees_injections_publiees"
+        if self.scope == "/adict/bas/v6":
+            endpoint = f"{self.api}/pce/{pce}/donnees_injection_publiees"
+
+        return self.get(
+            endpoint,
+            params={
+                "date_debut": from_date,
+                "date_fin": to_date,
+            },
+        )
+
     def donnees_contractuelles(self, pce: str) -> Any:
         (payload,) = self.get(f"{self.api}/pce/{pce}/donnees_contractuelles")
         return payload
@@ -212,8 +231,8 @@ class BaseAPI(metaclass=abc.ABCMeta):
 
 
 class StagingAPI(BaseAPI):
-    scope = "/adict/bas/v4"
-    api = "https://api.grdf.fr/adict/bas/v4"
+    scope = "/adict/bas/v6"
+    api = "https://api.grdf.fr/adict/bas/v6"
 
 
 class API(BaseAPI):

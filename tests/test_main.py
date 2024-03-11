@@ -41,6 +41,7 @@ Commands:
   donnees-consos-informatives
   donnees-consos-publiees
   donnees-contractuelles
+  donnees-injections-publiees
   donnees-techniques
   droits-acces
   droits-acces-specifiques
@@ -58,24 +59,23 @@ def test_cli_declare_acces() -> None:
 
 Options:
   --bas                           Use staging (bac à sable) environment
-  --client-secret TEXT            openid client secret  [required]
-  --client-id TEXT                openid client id  [required]
+  --client-secret TEXT            openid client secret
+  --client-id TEXT                openid client id
   --pce TEXT                      [required]
   --code-postal TEXT              [required]
   --courriel-titulaire TEXT       [required]
-  --date-consentement-declaree YYYY-MM-DD
-                                  [required]
   --date-debut-droit-acces YYYY-MM-DD
                                   [required]
   --date-fin-droit-acces YYYY-MM-DD
                                   [required]
   --perim-donnees-conso-debut TEXT
-                                  [required]
-  --perim-donnees-conso-fin TEXT  [required]
+  --perim-donnees-conso-fin TEXT
+  --perim-donnees-inj-debut TEXT
+  --perim-donnees-inj-fin TEXT
   --raison-sociale TEXT
   --nom-titulaire TEXT
   --role-tiers TEXT
-  --numero-telephone-titulaire TEXT
+  --numero-telephone-mobile-titulaire TEXT
   --perim-donnees-contractuelles
   --perim-donnees-techniques
   --perim-donnees-informatives
