@@ -59,8 +59,8 @@ def test_cli_declare_acces() -> None:
 
 Options:
   --bas                           Use staging (bac à sable) environment
-  --client-secret TEXT            openid client secret
-  --client-id TEXT                openid client id
+  --client-secret TEXT            openid client secret  [required]
+  --client-id TEXT                openid client id  [required]
   --pce TEXT                      [required]
   --code-postal TEXT              [required]
   --courriel-titulaire TEXT       [required]
