@@ -182,6 +182,23 @@ def donnees_consos_informatives(
 
 @main.command()
 @click.argument("pce")
+@click.option("--from-date", required=True)
+@click.option("--to-date", required=True)
+@api_options
+def donnees_injections_publiees(
+    client_id: str,
+    client_secret: str,
+    bas: bool,
+    pce: str,
+    from_date: str,
+    to_date: str,
+) -> None:
+    grdf = {True: api.StagingAPI, False: api.API}[bas](client_id, client_secret)
+    rich.print_json(data=grdf.donnees_injections_publiees(pce, from_date, to_date))
+
+
+@main.command()
+@click.argument("pce")
 @api_options
 def donnees_contractuelles(
     client_id: str,
