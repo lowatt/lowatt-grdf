@@ -28,8 +28,6 @@ import requests
 
 from . import LOGGER, models
 
-OPENID_ENDPOINT = "https://sofit-sso-oidc.grdf.fr/openam/oauth2/realms/externeGrdf"
-
 
 def raise_for_status(resp: requests.Response) -> None:
     try:
@@ -52,6 +50,11 @@ class BaseAPI(metaclass=abc.ABCMeta):
     @property
     @abc.abstractmethod
     def api(self) -> str:
+        raise NotImplementedError()
+
+    @property
+    @abc.abstractmethod
+    def auth_endpoint(self) -> str:
         raise NotImplementedError()
 
     def __init__(self, client_id: str, client_secret: str):
@@ -88,7 +91,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
 
     def _authenticate(self) -> tuple[str, float]:
         resp = requests.post(
-            f"{OPENID_ENDPOINT}/access_token",
+            self.auth_endpoint,
             data={
                 "grant_type": "client_credentials",
                 "client_id": self.client_id,
@@ -230,6 +233,9 @@ class BaseAPI(metaclass=abc.ABCMeta):
 class StagingAPI(BaseAPI):
     scope = "/adict/bas/v6"
     api = "https://api.grdf.fr/adict/bas/v6"
+    auth_endpoint = (
+        "https://sofit-sso-oidc.grdf.fr/openam/oauth2/realms/externeGrdf/access_token"
+    )
 
     def _parse_response(self, resp: requests.Response) -> Any:
         # XXX: Adjusts GRDF API responses to fit ndjson expected input because
@@ -253,3 +259,6 @@ class StagingAPI(BaseAPI):
 class API(BaseAPI):
     scope = "/adict/v2"
     api = "https://api.grdf.fr/adict/v2"
+    auth_endpoint = (
+        "https://adict-connexion.grdf.fr/oauth2/aus5y2ta2uEHjCWIR417/v1/token"
+    )
