@@ -31,7 +31,7 @@ from lowatt_grdf import api, models
 def grdf() -> api.API:
     responses.add(
         responses.POST,
-        f"{api.OPENID_ENDPOINT}/access_token",
+        api.NEW_AUTH_ENDPOINT,
         json={
             "access_token": "xxx",
             "expires_in": 14400,

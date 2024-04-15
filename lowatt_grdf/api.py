@@ -28,7 +28,12 @@ import requests
 
 from . import LOGGER, models
 
-OPENID_ENDPOINT = "https://sofit-sso-oidc.grdf.fr/openam/oauth2/realms/externeGrdf"
+OLD_AUTH_ENDPOINT = (
+    "https://sofit-sso-oidc.grdf.fr/openam/oauth2/realms/externeGrdf/access_token"
+)
+NEW_AUTH_ENDPOINT = (
+    "https://adict-connexion.grdf.fr/oauth2/aus5y2ta2uEHjCWIR417/v1/token"
+)
 
 
 def raise_for_status(resp: requests.Response) -> None:
@@ -83,12 +88,20 @@ class BaseAPI(metaclass=abc.ABCMeta):
         if self._access_token is None or (
             self._access_expires is not None and self._access_expires < time.time()
         ):
-            self._access_token, self._access_expires = self._authenticate()
+            self._access_token, self._access_expires = (
+                self._authenticate_with_fallback()
+            )
         return self._access_token
 
-    def _authenticate(self) -> tuple[str, float]:
+    def _authenticate_with_fallback(self) -> tuple[str, float]:
+        try:
+            return self._authenticate(auth_endpoint=NEW_AUTH_ENDPOINT)
+        except requests.exceptions.HTTPError:
+            return self._authenticate(auth_endpoint=OLD_AUTH_ENDPOINT)
+
+    def _authenticate(self, auth_endpoint: str) -> tuple[str, float]:
         resp = requests.post(
-            f"{OPENID_ENDPOINT}/access_token",
+            auth_endpoint,
             data={
                 "grant_type": "client_credentials",
                 "client_id": self.client_id,
@@ -230,6 +243,9 @@ class BaseAPI(metaclass=abc.ABCMeta):
 class StagingAPI(BaseAPI):
     scope = "/adict/bas/v6"
     api = "https://api.grdf.fr/adict/bas/v6"
+
+    def _authenticate_with_fallback(self) -> tuple[str, float]:
+        return self._authenticate(auth_endpoint=OLD_AUTH_ENDPOINT)
 
     def _parse_response(self, resp: requests.Response) -> Any:
         # XXX: Adjusts GRDF API responses to fit ndjson expected input because
