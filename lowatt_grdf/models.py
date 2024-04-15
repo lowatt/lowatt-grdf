@@ -109,10 +109,10 @@ class Access(BaseModel):
     statut_controle_preuve: Optional[str]
     date_debut_droit_acces: str
     date_fin_droit_acces: str
-    perim_donnees_conso_debut: Optional[str]
-    perim_donnees_conso_fin: Optional[str]
-    perim_donnees_inj_debut: Optional[str]
-    perim_donnees_inj_fin: Optional[str]
+    perim_donnees_conso_debut: Optional[str] = None
+    perim_donnees_conso_fin: Optional[str] = None
+    perim_donnees_inj_debut: Optional[str] = None
+    perim_donnees_inj_fin: Optional[str] = None
     raison_sociale_du_titulaire: Optional[str] = None
     nom_titulaire: Optional[str] = None
     numero_telephone_mobile_titulaire: Optional[str] = None
