@@ -59,6 +59,11 @@ class BaseAPI(metaclass=abc.ABCMeta):
     def api(self) -> str:
         raise NotImplementedError()
 
+    @property
+    @abc.abstractmethod
+    def _auth_endpoint(self) -> str:
+        raise NotImplementedError()
+
     def __init__(self, client_id: str, client_secret: str):
         self.client_id = client_id
         self.client_secret = client_secret
@@ -88,20 +93,12 @@ class BaseAPI(metaclass=abc.ABCMeta):
         if self._access_token is None or (
             self._access_expires is not None and self._access_expires < time.time()
         ):
-            self._access_token, self._access_expires = (
-                self._authenticate_with_fallback()
-            )
+            self._access_token, self._access_expires = self._authenticate()
         return self._access_token
 
-    def _authenticate_with_fallback(self) -> tuple[str, float]:
-        try:
-            return self._authenticate(auth_endpoint=NEW_AUTH_ENDPOINT)
-        except requests.exceptions.HTTPError:
-            return self._authenticate(auth_endpoint=OLD_AUTH_ENDPOINT)
-
-    def _authenticate(self, auth_endpoint: str) -> tuple[str, float]:
+    def _authenticate(self) -> tuple[str, float]:
         resp = requests.post(
-            auth_endpoint,
+            self._auth_endpoint,
             data={
                 "grant_type": "client_credentials",
                 "client_id": self.client_id,
@@ -244,8 +241,9 @@ class StagingAPI(BaseAPI):
     scope = "/adict/bas/v6"
     api = "https://api.grdf.fr/adict/bas/v6"
 
-    def _authenticate_with_fallback(self) -> tuple[str, float]:
-        return self._authenticate(auth_endpoint=OLD_AUTH_ENDPOINT)
+    @property
+    def _auth_endpoint(self) -> str:
+        return OLD_AUTH_ENDPOINT
 
     def _parse_response(self, resp: requests.Response) -> Any:
         # XXX: Adjusts GRDF API responses to fit ndjson expected input because
@@ -269,3 +267,9 @@ class StagingAPI(BaseAPI):
 class API(BaseAPI):
     scope = "/adict/v2"
     api = "https://api.grdf.fr/adict/v2"
+
+    @property
+    def _auth_endpoint(self) -> str:
+        if self.client_id.endswith("_grdf"):
+            return OLD_AUTH_ENDPOINT
+        return NEW_AUTH_ENDPOINT
