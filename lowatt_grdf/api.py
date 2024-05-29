@@ -243,7 +243,9 @@ class StagingAPI(BaseAPI):
 
     @property
     def _auth_endpoint(self) -> str:
-        return OLD_AUTH_ENDPOINT
+        if self.client_id.startswith("grdf_"):
+            return OLD_AUTH_ENDPOINT
+        return NEW_AUTH_ENDPOINT
 
     def _parse_response(self, resp: requests.Response) -> Any:
         # XXX: Adjusts GRDF API responses to fit ndjson expected input because
