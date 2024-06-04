@@ -454,8 +454,6 @@ def test_declare_acces(grdf: api.API, caplog: pytest.LogCaptureFixture) -> None:
         "numero_telephone_mobile_titulaire": "0600000000",
         "perim_donnees_conso_debut": "2020-01-01",
         "perim_donnees_conso_fin": "2020-01-01",
-        "perim_donnees_inj_debut": None,
-        "perim_donnees_inj_fin": None,
         "perim_donnees_contractuelles": "Faux",
         "perim_donnees_informatives": "Faux",
         "perim_donnees_publiees": "Faux",

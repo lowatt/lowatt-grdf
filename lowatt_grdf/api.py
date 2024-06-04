@@ -188,11 +188,14 @@ class BaseAPI(metaclass=abc.ABCMeta):
             raise RuntimeError(f"Theses consents have validation issues: {errors!r}")
 
     def declare_acces(self, access: models.DeclareAccess) -> None:
-        data = models.converter.dumps(access)
+        data = {
+            k: v
+            for k, v in models.converter.unstructure(access).items()
+            if v is not None
+        }
         self.put(
             f"{self.api}/pce/{access.pce}/droit_acces",
-            headers={"Content-Type": "application/json"},
-            data=data,
+            json=data,
         )
         LOGGER.info("Successfully declared access to %s", access.pce)
 
