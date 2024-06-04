@@ -76,6 +76,8 @@ class BaseAPI(metaclass=abc.ABCMeta):
 
     def request(self, verb: str, *args: Any, **kwargs: Any) -> Any:
         headers = kwargs.setdefault("headers", {})
+        headers.setdefault("Accept", "application/json")
+        headers.setdefault("Content-Type", "application/json")
         headers["Authorization"] = f"Bearer {self.access_token}"
         if self._last_request is not None:
             time.sleep(min(max(time.time() - self._last_request, 1), 1))
