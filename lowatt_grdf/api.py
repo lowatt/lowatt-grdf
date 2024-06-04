@@ -89,6 +89,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
     get = functools.partialmethod(request, "GET")
     post = functools.partialmethod(request, "POST")
     put = functools.partialmethod(request, "PUT")
+    patch = functools.partialmethod(request, "PATCH")
 
     @property
     def access_token(self) -> str:
@@ -156,6 +157,11 @@ class BaseAPI(metaclass=abc.ABCMeta):
                 "etat_droit_acces": access_right_state,
                 "statut_controle_preuve": proof_control_status,
             },
+        )
+
+    def revoke_acces(self, id_droit_acces: str) -> Any:
+        return self.patch(
+            f"{self.api}/droit_acces/{id_droit_acces}",
         )
 
     def check_consent_validation(self, pce: Optional[list[str]] = None) -> None:

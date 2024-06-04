@@ -45,6 +45,7 @@ Commands:
   donnees-techniques
   droits-acces
   droits-acces-specifiques
+  revoke-acces
 """
     )
 
