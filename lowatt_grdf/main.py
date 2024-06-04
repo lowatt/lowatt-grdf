@@ -147,6 +147,16 @@ def droits_acces_specifiques(
 
 
 @main.command()
+@click.argument("id_droit_acces")
+@api_options
+def revoke_acces(
+    client_id: str, client_secret: str, bas: bool, id_droit_acces: str
+) -> None:
+    grdf = {True: api.StagingAPI, False: api.API}[bas](client_id, client_secret)
+    rich.print_json(data=grdf.revoke_acces(id_droit_acces))
+
+
+@main.command()
 @click.argument("pce")
 @click.option("--from-date", required=True)
 @click.option("--to-date", required=True)
