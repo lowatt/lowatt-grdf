@@ -167,10 +167,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
     def check_consent_validation(self, pce: Optional[list[str]] = None) -> None:
         resp = self.droits_acces(pce)
         # XXX: this looks like a bug, "liste_acces" should be part of the response
-        if resp and "liste_acces" in resp[0]:
-            items = resp[0]["liste_acces"]
-        else:
-            items = resp
+        items = resp[0]["liste_acces"] if resp and "liste_acces" in resp[0] else resp
         droits: dict[str, list[models.Access]] = {}
         for item in items:
             if "code_statut_traitement" in item:

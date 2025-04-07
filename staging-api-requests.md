@@ -131,7 +131,7 @@ Requests to send to the Staging API v6 of GRDF ADICT, based on `API GRDF ADICT_J
    # Not implemented yet
    # lowatt-grdf donnees-consos-informatives --bas 09999999928289 --period 2023-09
    ```
-1. Cas non passant : Format du paramètre période incorrect 
+1. Cas non passant : Format du paramètre période incorrect
    ```shell
    # Not implemented yet
    # lowatt-grdf donnees-consos-informatives --bas 09999999928283 --period 2023-09-01
