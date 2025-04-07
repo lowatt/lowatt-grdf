@@ -104,7 +104,6 @@ class Access(BaseModel):
     pce: str
     etat_droit_acces: str
     perim_donnees_publiees: bool
-    perim_donnees_informatives: bool
     courriel_titulaire: str
     statut_controle_preuve: Optional[str]
     date_debut_droit_acces: str
@@ -116,6 +115,7 @@ class Access(BaseModel):
     raison_sociale_du_titulaire: Optional[str] = None
     nom_titulaire: Optional[str] = None
     numero_telephone_mobile_titulaire: Optional[str] = None
+    perim_donnees_informatives: bool = False
     perim_donnees_contractuelles: bool = False
     perim_donnees_techniques: bool = False
 
