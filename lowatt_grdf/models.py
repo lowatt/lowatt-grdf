@@ -186,7 +186,7 @@ converter.register_structure_hook(
         **{  # type: ignore[arg-type]
             f.name: cattrs.gen.override(struct_hook=structure_grdf_bool)
             for f in attrs.fields(Access)
-            if f.type == bool
+            if f.type is bool
         },
     ),
 )
@@ -199,7 +199,7 @@ converter.register_unstructure_hook(
         **{  # type: ignore[arg-type]
             f.name: cattrs.gen.override(unstruct_hook=unstructure_grdf_bool)
             for f in attrs.fields(DeclareAccess)
-            if f.type == bool
+            if f.type is bool
         },
     ),
 )

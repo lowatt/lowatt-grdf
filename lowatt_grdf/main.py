@@ -67,7 +67,7 @@ def options_from_model(
                 kwargs["required"] = True
             else:
                 kwargs.update(required=False, default=field.default)
-            if field.type == bool:
+            if field.type is bool:
                 kwargs["is_flag"] = True
             if field.alias.startswith("date_"):
                 kwargs["metavar"] = "YYYY-MM-DD"

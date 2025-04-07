@@ -1,7 +1,0 @@
-include *.ini
-include dev-requirements.txt
-include .flake8
-include .pre-commit-config.yaml
-include lowatt_grdf/py.typed
-recursive-include tests *.py
-prune .tox

@@ -49,19 +49,3 @@ typing = [
 
 [project.scripts]
 lowatt-grdf = "lowatt_grdf.main:main"
-
-[tool.hatch.version]
-source = "vcs"
-
-[tool.hatch.version.raw-options]
-local_scheme = "no-local-version"
-
-[tool.black]
-target-version = ['py39']
-include = '\.pyi?$'
-exclude = '(\.tox|\.git)'
-
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-known_first_party = ["lowatt_grdf"]
