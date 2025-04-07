@@ -19,7 +19,7 @@
 # THE SOFTWARE.
 
 import time
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 import attrs
 import cattrs
@@ -47,6 +47,14 @@ class BaseModel:
     pass
 
 
+ThirdRole = Literal[
+    "AUTORISE_CONTRAT_FOURNITURE",
+    "DETENTEUR_CONTRAT_FOURNITURE",
+    "AUTORISE_CONTRAT_INJECTION",
+    "DETENTEUR_CONTRAT_INJECTION",
+]
+
+
 @attrs.frozen
 class DeclareAccess(BaseModel):
     pce: str
@@ -68,7 +76,7 @@ class DeclareAccess(BaseModel):
     )
     raison_sociale: Optional[str] = None
     nom_titulaire: Optional[str] = None
-    role_tiers: str = "AUTORISE_CONTRAT_FOURNITURE"
+    role_tiers: ThirdRole = "AUTORISE_CONTRAT_FOURNITURE"
     numero_telephone_mobile_titulaire: Optional[str] = None
     perim_donnees_contractuelles: bool = False
     perim_donnees_techniques: bool = False
@@ -101,6 +109,7 @@ class DeclareAccess(BaseModel):
 
 @attrs.frozen
 class Access(BaseModel):
+    role_tiers: ThirdRole
     pce: str
     etat_droit_acces: str
     perim_donnees_publiees: bool
