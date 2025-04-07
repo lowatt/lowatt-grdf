@@ -4,6 +4,7 @@ from lowatt_grdf import models
 def test_structure_access() -> None:
     obj = models.converter.structure(
         {
+            "role_tiers": "AUTORISE_CONTRAT_FOURNITURE",
             "id_pce": "0123",
             "perim_donnees_conso_debut": "2023-07-11",
             "perim_donnees_conso_fin": "2022-07-11",
@@ -22,6 +23,7 @@ def test_structure_access() -> None:
         models.Access,
     )
     assert obj == models.Access(
+        role_tiers="AUTORISE_CONTRAT_FOURNITURE",
         pce="0123",
         perim_donnees_conso_debut="2023-07-11",
         perim_donnees_conso_fin="2022-07-11",

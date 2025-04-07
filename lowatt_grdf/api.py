@@ -123,13 +123,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
             return self.get(f"{self.api}/droits_acces")
         return self.post(f"{self.api}/droits_acces", json={"id_pce": pce})
 
-    ThirdRole = Literal[
-        "AUTORISE_CONTRAT_FOURNITURE",
-        "DETENTEUR_CONTRAT_FOURNITURE",
-        "AUTORISE_CONTRAT_INJECTION",
-        "DETENTEUR_CONTRAT_INJECTION",
-    ]
-    DEFAULT_THIRD_ROLE = get_args(ThirdRole)
+    DEFAULT_THIRD_ROLE = get_args(models.ThirdRole)
     AccessRightState = Literal[
         "Active", "A valider", "Révoquée", "A revérifier", "Obsolète", "Refusée"
     ]
@@ -145,7 +139,7 @@ class BaseAPI(metaclass=abc.ABCMeta):
     def droits_acces_specifiques(
         self,
         pce: Optional[list[str]] = None,
-        third_role: tuple[ThirdRole] = DEFAULT_THIRD_ROLE,
+        third_role: tuple[models.ThirdRole] = DEFAULT_THIRD_ROLE,
         access_right_state: tuple[AccessRightState] = DEFAULT_ACCESS_RIGHT_STATE,
         proof_control_status: tuple[ProofControlStatus] = DEFAULT_PROOF_CONTROL_STATUS,
     ) -> Any:

@@ -131,7 +131,7 @@ def droits_acces_specifiques(
     client_secret: str,
     bas: bool,
     pce: tuple[str],
-    role: tuple[api.BaseAPI.ThirdRole],
+    role: tuple[models.ThirdRole],
     etat: tuple[api.BaseAPI.AccessRightState],
     preuve: tuple[api.BaseAPI.ProofControlStatus],
 ) -> None:
