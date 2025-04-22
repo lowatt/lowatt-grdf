@@ -77,7 +77,8 @@ class BaseAPI(metaclass=abc.ABCMeta):
     def request(self, verb: str, *args: Any, **kwargs: Any) -> Any:
         headers = kwargs.setdefault("headers", {})
         headers.setdefault("Accept", "application/json")
-        headers.setdefault("Content-Type", "application/json")
+        if "files" not in kwargs:
+            headers.setdefault("Content-Type", "application/json")
         headers["Authorization"] = f"Bearer {self.access_token}"
         if self._last_request is not None:
             time.sleep(min(max(time.time() - self._last_request, 1), 1))
@@ -195,6 +196,14 @@ class BaseAPI(metaclass=abc.ABCMeta):
             json=data,
         )
         LOGGER.info("Successfully declared access to %s", access.pce)
+
+    def transmettre_preuves(
+        self, id_droit_acces: str, preuves: tuple[tuple[str, bytes], ...]
+    ) -> Any:
+        return self.put(
+            f"{self.api}/droit_acces/{id_droit_acces}/preuves",
+            files=(("preuves", (fname, data)) for fname, data in preuves),
+        )
 
     def donnees_consos_publiees(self, pce: str, from_date: str, to_date: str) -> Any:
         return self.get(
